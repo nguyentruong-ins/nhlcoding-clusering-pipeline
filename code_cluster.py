@@ -153,16 +153,18 @@ def cluster_files(data_folder, data_locate, kmeans_lables, pca):
 
     """
     label_types = collections.Counter(kmeans_lables).keys()
-    os.chdir("/mnt/data/Study/HK232/LVTN/Codes/LNHCodeClustering")
-    if not "codet5p_output" in os.listdir():
-        os.mkdir("/mnt/data/Study/HK232/LVTN/Codes/LNHCodeClustering/codet5p_output")
-    os.chdir("/mnt/data/Study/HK232/LVTN/Codes/LNHCodeClustering/codet5p_output")
+
+    if "codet5p_output" in os.listdir():
+        shutil.rmtree("codet5p_output")
+
+    os.mkdir("codet5p_output")
+
     for label_type in label_types:
-        os.mkdir(os.path.join("/mnt/data/Study/HK232/LVTN/Codes/LNHCodeClustering/codet5p_output", str(label_type)))
+        os.mkdir(os.path.join("codet5p_output", str(label_type)))
     for i in range(len(pca)):
         pca_di = pca[i]
         current_location = os.path.join(data_folder, data_locate[str(pca_di)])
-        shutil.copyfile(current_location, "/mnt/data/Study/HK232/LVTN/Codes/LNHCodeClustering/codet5p_output/" + str(kmeans_lables[i]) + "/" + data_locate[str(pca_di)])
+        shutil.copyfile(current_location, "codet5p_output/" + str(kmeans_lables[i]) + "/" + data_locate[str(pca_di)])
         
     return
 
@@ -198,4 +200,5 @@ def pipeline(folder, language):
 if __name__ == "__main__":
     # TODO: Replace with the data folder (which contains multiple files)
     # Currently, `language` option won't be used.
-    pipeline(folder="/mnt/data/Study/HK232/LVTN/Codes/LNHCodeClustering/data", language="cpp")
+    # pipeline(folder="/mnt/data/Study/HK232/LVTN/Codes/LNHCodeClustering/data", language="cpp")
+    pipeline("data", "cpp")
