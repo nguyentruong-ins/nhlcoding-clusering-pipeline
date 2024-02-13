@@ -197,4 +197,5 @@ def pipeline(folder, language):
 
 if __name__ == "__main__":
     # TODO: Replace with the data folder (which contains multiple files)
-    pipeline("/mnt/data/Study/HK232/LVTN/Codes/LNHCodeClustering/data", "cpp")
+    # Currently, `language` option won't be used.
+    pipeline(folder="/mnt/data/Study/HK232/LVTN/Codes/LNHCodeClustering/data", language="cpp")
