@@ -11,12 +11,12 @@ model = AutoModel.from_pretrained(checkpoint, trust_remote_code=True).to(device)
 
 ################## TOKENIZE THE CODE SNIPPET AND PUT IT TO MODEL ##################
 # Tokenizer input
-with open ("./data/1.py", "r") as f:
+with open ("../data/submission_0.cpp", "r") as f:
     snippet = f.read()
     inputs = tokenizer.encode(snippet, return_tensors="pt").to(device)
 
 # Put the tokenizerred input into model in order to generate embedding
-embedding = model(inputs)[0]
+embedding = model(inputs)
 
 # print(f'Dimension of the embedding: {embedding.size()[0]}, with norm={embedding.norm().item()}')
 # # Dimension of the embedding: 256, with norm=1.0

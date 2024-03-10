@@ -2,29 +2,104 @@
 # Just for evaluate
 
 import os
+import re
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import collections
 import shutil
+import subprocess
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
 from sklearn.decomposition import PCA
 from sklearn import metrics
 from sklearn.model_selection import ParameterGrid
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, DBSCAN
 from transformers import AutoModel, AutoTokenizer
 
 #################################### SET CHECKPOINT ####################################
 CHECK_POINT = "Salesforce/codet5p-110m-embedding"
+STATE_DICT_FILE = "./pretrained/state_dict_06h_03_03.pt"
 
 checkpoint = CHECK_POINT
 device = "cpu"  # for GPU usage or "cpu" for CPU usage
 
+
+# MODEL
+class ClassificationHead(nn.Module):
+    def __init__(self) -> None:
+        super(ClassificationHead, self).__init__()
+        # self.dense = nn.Linear(256, 256)
+        # self.dropout = nn.Dropout(0.0, False)
+        # self.out_proj = nn.Linear(256, 12)
+        self.dense1 = nn.Linear(256, 256)
+        self.dense2 = nn.Linear(256, 128)
+        self.out_proj = nn.Linear(128, 7)
+
+    def forward(self, inputs):
+        outputs = self.dense(inputs)
+
+        outputs = F.relu(self.dropout(outputs))
+        outputs = F.relu(self.out_proj(outputs))
+
+        return outputs
+
+class CodeT5ClassificationModel(nn.Module):
+    def __init__(self):
+        super(CodeT5ClassificationModel, self).__init__()
+
+        self.base_model = AutoModel.from_pretrained(CHECK_POINT, trust_remote_code=True).to(device)
+        self.classification_head = ClassificationHead()
+
+
+    def forward(self, input_ids):
+        outputs = self.base_model(input_ids)
+        # outputs = self.classification_head(outputs)
+
+        return outputs
+
+def comment_remover(code):
+    def replacer(match):
+        s = match.group(0)
+        if s.startswith('/'):
+            return " " # note: a space and not an empty string
+        else:
+            return s
+    pattern = re.compile(
+        r'//.*?$|/\*.*?\*/|\'(?:\\.|[^\\\'])*\'|"(?:\\.|[^\\"])*"',
+        re.DOTALL | re.MULTILINE
+    )
+    return re.sub(pattern, replacer, code)
+
+def format_code(code, style='google'):
+    # Run clang-format with the specified style and capture the formatted code
+    formatted_code = subprocess.run(
+        ['clang-format', '-style=' + style], 
+        input=code.encode('utf-8'), 
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.PIPE
+    )
+
+    # Return the formatted code as a string
+    return formatted_code.stdout.decode('utf-8')
+
+def code_preprocess(code):
+    comment_free_code = comment_remover(code)
+    formatted_code = format_code(comment_free_code)
+
+    return formatted_code
+
 ##################### GET THE TOKENIZER AND MODEL FROM HUGGING FACE #####################
 tokenizer = AutoTokenizer.from_pretrained(checkpoint, trust_remote_code=True)
+
+
 model = AutoModel.from_pretrained(checkpoint, trust_remote_code=True).to(device)
 
+# model = CodeT5ClassificationModel()
+# model.load_state_dict(torch.load(STATE_DICT_FILE, map_location="cpu"))
 
-def load_embeddings(folder, language):
+def load_embeddings(folder):
     """
     To get the embeddings from specific folder with specific language
 
@@ -33,19 +108,42 @@ def load_embeddings(folder, language):
     """
     program_snippets = []
     embedding_vectors = []
-    embedding_locations = []
     for file in os.listdir(folder):
         with open(os.path.join(folder, file), "r") as f:
             new_snippet = f.read()
             program_snippets.append(new_snippet)
-            embedding_locations.append(file)
             
     for i in range(30):
-        inputs = tokenizer.encode(program_snippets[i], return_tensors="pt").to(device)
+        remove_commnet_snippet = code_preprocess(program_snippets[i])
+        inputs = tokenizer.encode(remove_commnet_snippet, max_length=256, padding="max_length", truncation=True, return_tensors="pt").to(device)
+        # inputs = tokenizer(program_snippets[i], max_length=256, padding="max_length", truncation=True, return_tensors="pt").to(device)
         new_embedding = model(inputs)[0].detach().numpy()
         embedding_vectors.append(new_embedding)
 
-    return embedding_vectors, embedding_locations
+    return embedding_vectors, program_snippets
+
+def load_embeddings_csv(file_path, problem_name):
+    """
+    To get the embeddings from specific file
+
+    :param folder: the file path
+    :return: embedding_vectors - The embedding vectors that are created; embedding_locations - The location of the file which is embedded respectively
+    """
+
+    df = pd.read_csv(file_path)
+    filter_df = df[(df['problem_slug'] == problem_name)]
+
+    program_snippets = filter_df['code'].to_list()
+    embedding_vectors = []
+
+    for snippet in program_snippets:
+        remove_comment_snippet = code_preprocess(snippet)
+        inputs = tokenizer.encode(remove_comment_snippet, return_tensors="pt").to(device)
+        # inputs = tokenizer.encode(remove_comment_snippet, max_length=256, padding="max_length", truncation=True, return_tensors="pt").to(device)
+        new_embedding = model(inputs)[0].detach().numpy()
+        embedding_vectors.append(new_embedding)
+    
+    return embedding_vectors, program_snippets
 
 def pca_embeddings(df, dimension=2):
     """To reduce the dimensions of the embedding vector we use Principal Component Analysis (PCA).
@@ -84,7 +182,7 @@ def visualizing_results(pca_result, label, centroids_pca):
 
     plt.show()
 
-def visualizing_results_3d(pca_result, label, centroids_pca):
+def visualizing_results_3d(pca_result, label, problem_name = None, centroids_pca = None):
     x = pca_result[:, 0]
     y = pca_result[:, 1]
     z = pca_result[:, 2]
@@ -92,12 +190,22 @@ def visualizing_results_3d(pca_result, label, centroids_pca):
     fig = plt.figure(figsize = (10, 7))
     ax = plt.axes(projection = "3d")
 
-    ax.scatter3D(x, y, z, c = label)
+    scatter = ax.scatter3D(x, y, z, c = label)
+    # Adding labels for data points
+    legend = ax.legend(*scatter.legend_elements(),
+                       title="Legend", loc='upper left')
+    ax.add_artist(legend)
+    
+    for i in range(len(x)):
+        ax.text(x[i], y[i], z[i], '%s' % (str(i)), size=13, zorder=1)
 
-    ax.scatter3D(centroids_pca[:, 0], centroids_pca[:, 1], centroids_pca[:, 2], marker='X', s=200,
-                 linewidths=1.5, color='red', edgecolors='black')
+    # ax.scatter3D(centroids_pca[:, 0], centroids_pca[:, 1], centroids_pca[:, 2], marker='X', s=200,
+    #              linewidths=1.5, color='red', edgecolors='black')
+
+    ax.legend()
 
     plt.show()
+    # plt.savefig("{}.png".format(problem_name))
     
 
 def kmean_hyper_param_tuning(data):
@@ -108,8 +216,8 @@ def kmean_hyper_param_tuning(data):
     :return: best number of clusters for the model (used for KMeans n_clusters)
     """
     # candidate values for our number of cluster
-    # parameters = [2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40]
-    parameters = [3]
+    parameters = [2, 3, 4, 5]
+    # parameters = [3]
 
     # instantiating ParameterGrid, pass number of clusters as input
     parameter_grid = ParameterGrid({'n_clusters': parameters})
@@ -142,7 +250,7 @@ def kmean_hyper_param_tuning(data):
 
     return best_grid['n_clusters']
 
-def cluster_files(data_folder, data_locate, kmeans_lables, pca):
+def cluster_files(data_locate, kmeans_lables, pca):
     """
     Help us cluster the submissions after vectorizing into right folder
 
@@ -161,44 +269,62 @@ def cluster_files(data_folder, data_locate, kmeans_lables, pca):
 
     for label_type in label_types:
         os.mkdir(os.path.join("codet5p_output", str(label_type)))
+
     for i in range(len(pca)):
         pca_di = pca[i]
-        current_location = os.path.join(data_folder, data_locate[str(pca_di)])
-        shutil.copyfile(current_location, "codet5p_output/" + str(kmeans_lables[i]) + "/" + data_locate[str(pca_di)])
-        
+        snippet = data_locate[str(pca_di)]
+        file_path = "codet5p_output/{}/submission_{}.cpp".format(str(kmeans_lables[i]), i)
+
+        with open(file_path, "w") as f:
+            f.write(snippet)
+            f.close()
+
     return
 
-def pipeline(folder, language):
+def pipeline(folder, problem_name):
     """
     The main pipeline
     """
     # Get embeddings with codet5p
-    vectors, embedding_locations = load_embeddings(folder, language)
+    # vectors, program_snippets = load_embeddings(folder)
+    vectors, program_snippets = load_embeddings_csv("csv/sample_data_v5.csv", problem_name)
     df = pd.DataFrame(vectors, columns=None)
 
     # Dimenstion reducing with PCA
     pca, pca_transform = pca_embeddings(df, dimension=3)
-    data_locate = {}
-    for pca_di, location in zip(pca, embedding_locations):
-        data_locate[str(pca_di)] = location 
+    label_submissions = {}
+    for pca_di, snippet in zip(pca, program_snippets):
+        label_submissions[str(pca_di)] = snippet 
 
-    # HyperTuning Params for Kmeans
-    optimum_num_clusters = kmean_hyper_param_tuning(df)
+    ####### Clustering using Kmeans ###########
+    # # HyperTuning Params for Kmeans
+    # optimum_num_clusters = kmean_hyper_param_tuning(df)
 
-    # Fitting KMeans
-    kmeans = KMeans(n_clusters=optimum_num_clusters)
-    kmeans.fit(df)
-    centroids = kmeans.cluster_centers_
-    centroids_pca = pca_transform.transform(centroids)
+    # # Fitting KMeans
+    # kmeans = KMeans(n_clusters=optimum_num_clusters)
+    # kmeans.fit(df)
+    # centroids = kmeans.cluster_centers_
+    # centroids_pca = pca_transform.transform(centroids)
     
-    # Clustering files (If we just want to see the plot, we can comment this)
-    cluster_files(folder, data_locate, kmeans.labels_, pca)
+    # # Clustering files (If we just want to see the plot, we can comment this)
+    # cluster_files(label_submissions, kmeans.labels_, pca)
 
-    # Visualize data
-    visualizing_results_3d(pca, kmeans.labels_, centroids_pca)
+    # # Visualize data
+    # visualizing_results_3d(pca, kmeans.labels_, centroids_pca)
+    ############################################
+
+    ####### Clustering using DBSCAN ###########
+    dbscan_model = DBSCAN(eps=0.3, min_samples=5)
+
+    dbscan = dbscan_model.fit(df)
+    cluster_files(label_submissions, dbscan.labels_, pca)
+    visualizing_results_3d(pca, dbscan.labels_, problem_name, None)
+    ############################################
 
 if __name__ == "__main__":
     # TODO: Replace with the data folder (which contains multiple files)
     # Currently, `language` option won't be used.
     # pipeline(folder="/mnt/data/Study/HK232/LVTN/Codes/LNHCodeClustering/data", language="cpp")
-    pipeline("data", "cpp")
+    
+
+    pipeline("data", "Stack_1")

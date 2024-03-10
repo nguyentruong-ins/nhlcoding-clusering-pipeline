@@ -8,15 +8,37 @@ Date: June 2023
 import os
 import pprint
 import argparse
+import torch.nn as nn
+import torch.nn.functional as F
 from datasets import load_dataset, load_from_disk
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, TrainingArguments, Trainer
+from transformers import AutoModel, AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments, Trainer, DataCollatorWithPadding
 
 
-def run_training(args, model, train_data):
+# Create CodeT5Classification class in order to create classification model
+class CodeT5ClassificationModel(nn.Module):
+    def __init__(self):
+        super(CodeT5ClassificationModel, self).__init__()
+
+        self.base_model = AutoModel.from_pretrained("Salesforce/codet5p-110m-embedding", trust_remote_code=True).to("cpu")
+        self.fc1 = nn.Linear(256,120)
+        self.fc2 = nn.Linear(120,84)
+        self.fc3 = nn.Linear(84,7)
+        
+
+    def forward(self, input_ids, attention_mask):
+        outputs = self.base_model(input_ids)[0]
+
+        outputs = F.relu(self.fc1(outputs))
+        outputs = F.relu(self.fc2(outputs))
+        outputs = self.fc3(outputs)
+
+        return outputs
+
+def run_training(args, model, train_data, data_collator):
     print(f"Starting main loop")
 
     training_args = TrainingArguments(
-        report_to='tensorboard',
+        report_to='none',
         output_dir=args.save_dir,
         overwrite_output_dir=False,
 
@@ -48,6 +70,7 @@ def run_training(args, model, train_data):
         model=model,
         args=training_args,
         train_dataset=train_data,
+        data_collator=data_collator
     )
 
     trainer.train()
@@ -60,39 +83,31 @@ def run_training(args, model, train_data):
 
 def load_tokenize_data(args):
     # Load and tokenize data
-    if os.path.exists(args.cache_data):
+    # if os.path.exists(args.cache_data):
+    if False:
         train_data = load_from_disk(args.cache_data)
         print(f'  ==> Loaded {len(train_data)} samples')
         return train_data
     else:
         # Example code to load and process code_x_glue_ct_code_to_text python dataset for code summarization task
-        datasets = load_dataset("code_x_glue_ct_code_to_text", 'python', split="train")
+        
+        # TODO: modify this
+        datasets = load_dataset("systemk/codenet", split="train[10:20]")
+        datasets.select_columns(["code", "status"])
         tokenizer = AutoTokenizer.from_pretrained(args.load)
 
         def preprocess_function(examples):
-            source = [' '.join(ex) for ex in examples["code_tokens"]]
-            target = [' '.join(ex) for ex in examples["docstring_tokens"]]
-
-            model_inputs = tokenizer(source, max_length=args.max_source_len, padding="max_length", truncation=True)
-            labels = tokenizer(target, max_length=args.max_target_len, padding="max_length", truncation=True)
-
-            model_inputs["labels"] = labels["input_ids"].copy()
-            model_inputs["labels"] = [
-                [(l if l != tokenizer.pad_token_id else -100) for l in label] for label in model_inputs["labels"]
-            ]
-            return model_inputs
+            return tokenizer(examples["code"], truncation=True)
 
         train_data = datasets.map(
-            preprocess_function,
-            batched=True,
-            remove_columns=datasets.column_names,
-            num_proc=64,
-            load_from_cache_file=False,
+            preprocess_function
         )
         print(f'  ==> Loaded {len(train_data)} samples')
         train_data.save_to_disk(args.cache_data)
         print(f'  ==> Saved to {args.cache_data}')
-        return train_data
+
+        data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+        return train_data, data_collator
 
 
 def main(args):
@@ -105,24 +120,26 @@ def main(args):
 
     # Load and tokenize data using the tokenizer from `args.load`. If the data is already cached, load it from there.
     # You can customize this function to load your own data for any Seq2Seq LM tasks.
-    train_data = load_tokenize_data(args)
-
-    if args.data_num != -1:
-        train_data = train_data.select([i for i in range(args.data_num)])
+    train_data, data_collator = load_tokenize_data(args)
 
     # Load model from `args.load`
-    model = AutoModelForSeq2SeqLM.from_pretrained(args.load)
-    print(f"  ==> Loaded model from {args.load}, model size {model.num_parameters()}")
+    model = CodeT5ClassificationModel()
+    # model = AutoModelForSequenceClassification.from_pretrained(args.load)
+    # print(f"  ==> Loaded model from {args.load}, model size {model.num_parameters()}")
 
-    run_training(args, model, train_data)
+    run_training(args, model, train_data, data_collator)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="CodeT5+ finetuning on Seq2Seq LM task")
+    parser = argparse.ArgumentParser(description="CodeT5+ finetuning on Seq2Classification task")
     parser.add_argument('--data-num', default=-1, type=int)
+
+    # Can we change this? ####
     parser.add_argument('--max-source-len', default=320, type=int)
     parser.add_argument('--max-target-len', default=128, type=int)
-    parser.add_argument('--cache-data', default='cache_data/summarize_python', type=str)
+    #############
+
+    parser.add_argument('--cache-data', default='cache_data/classification-test', type=str)
     parser.add_argument('--load', default='Salesforce/codet5p-220m', type=str)
 
     # Training
@@ -136,7 +153,7 @@ if __name__ == "__main__":
     parser.add_argument('--fp16', default=False, action='store_true')
 
     # Logging and stuff
-    parser.add_argument('--save-dir', default="saved_models/summarize_python", type=str)
+    parser.add_argument('--save-dir', default="saved_models/classification-test", type=str)
     parser.add_argument('--log-freq', default=10, type=int)
     parser.add_argument('--save-freq', default=500, type=int)
 
