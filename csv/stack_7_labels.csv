@@ -1,0 +1,1192 @@
+problem_slug,submission_id,student_code,code,labels,score
+Stack_7,1454531,2210997,"string parenthesesReversal(string s) {
+    stack<std::string> stringStack;
+    string result;
+
+    for (char c : s) {
+        if (c == '(') {
+            stringStack.push(result);
+            result = """";
+        } else if (c == ')') {
+            std::string reversed = result;
+            result = stringStack.top() + string(reversed.rbegin(), reversed.rend());
+            stringStack.pop();
+        } else {
+            result += c;
+        }
+    }
+
+    return result;
+}",0,1.0
+Stack_7,1454547,2212303,"string parenthesesReversal(string s) {
+    //special case
+    if (s == """") return """";
+    if (s.length() <= 1) return s;
+
+    stack<char> st;
+    int n = s.length();
+    string result = """";
+
+    for (int i = 0; i < n; i++) {
+        if (s[i] == ')') {
+            string temp = """";
+            if (st.empty()) continue;
+            while (st.top() != '(') {
+                temp += st.top();
+                st.pop();
+            }
+            st.pop();
+            if (!st.empty()) {
+                for (size_t j = 0; j < temp.length(); j++) {
+                    st.push(temp[j]);
+                }
+            }
+            else result += temp;
+        } else if ( s[i] == '(') {
+            
+            
+                
+                while (s[i] != ')'){
+                    st.push(s[i]);
+                    
+                    i++;
+                    
+                }
+                if (i == n) continue;
+                i--; // prepare for incrment;
+        }
+        else {
+            if (st.empty())
+            result += s[i];
+            else st.push(s[i]);
+        }
+    }
+    string temp = """";
+    while (!st.empty()&& st.top()!='(') {
+        temp += st.top();
+        st.pop();
+    }
+    for (size_t j = 0; j < temp.length(); j++) {
+        st.push(temp[j]);
+    }
+    while (!st.empty() && st.top() != '(') {
+        result += st.top();
+        st.pop();
+    }
+    return result;
+}",;,.0
+Stack_7,1454553,2211876,"string parenthesesReversal(string s) {
+    // STUDENT ANSWER
+    stack<std::string> stack;
+    string current = """";
+
+    for (char c : s) {
+        if (c == '(') {
+            // Push the current string onto the stack and reset it.
+            stack.push(current);
+            current = """";
+        } else if (c == ')') {
+            // Reverse the current string and append it to the previous string.
+            std::string reversed;
+            for (int i = current.length() - 1; i >= 0; i--) {
+                reversed += current[i];
+            }
+            current = stack.top() + reversed;
+            stack.pop();
+        } else {
+            // Append the character to the current string.
+            current += c;
+        }
+    }
+
+    return current;
+}",0,1.0
+Stack_7,1454572,2210200,"#include<algorithm>
+
+string parenthesesReversal(string s) {
+    // STUDENT ANSWER
+    int n = s.size();
+    stack<char> st;
+    for(int i = 0; i < n; i++){
+        if(s[i] == '('){
+            st.push(s[i]);
+        }
+        else if(s[i] == ')'){
+            string temp = """";
+            while(!st.empty() && st.top() != '('){
+                temp += st.top();
+                st.pop();
+            }
+            st.pop();
+            int sz = temp.size();
+            for(int j = 0; j < sz; j++) st.push(temp[j]);
+        }
+        else{
+            st.push(s[i]);
+        }
+    }
+    string ans = """";
+    while(!st.empty()){
+        ans += st.top();
+        st.pop();
+    }
+    reverse(ans.begin(), ans.end());
+    return ans;
+}",1,1.0
+Stack_7,1454582,2211170,"string parenthesesReversal(string s) {
+    stack<char> st;
+    int n = s.length();
+    for(int i = 0; i < n; i++) {
+        char ch = s[i];
+        if(ch == '(' || ch != ')') {
+            st.push(ch);
+        }
+
+        if(ch == ')' && !st.empty()) {
+            string temp = """";
+            while(st.top() != '(') {
+                temp += st.top();
+                st.pop();
+            }
+            st.pop();
+
+            int m = temp.length();
+
+            if(st.empty() && i == n - 1) {
+                return temp;
+            } else {
+                for(int i = 0; i < m; i++) {
+                    st.push(temp[i]);
+                }
+            }
+        }
+    }
+
+    stack<char> rev;
+    while(!st.empty()) {
+        rev.push(st.top());
+        if(st.top() == '(' || st.top() == ')') {
+            return """";
+        }
+        st.pop();
+    }
+
+    string ans = """";
+    while(!rev.empty()) {
+        ans.push_back(rev.top());
+        rev.pop();
+    }
+    return ans;
+}",1,1.0
+Stack_7,1454583,2013048,"#include <algorithm> // Include the algorithm header for reverse
+
+std::string parenthesesReversal(std::string s) {
+    std::stack<int> openingParentheses;
+    int n = s.size();
+
+    for (int i = 0; i < n; i++) {
+        if (s[i] == '(') {
+            openingParentheses.push(i);
+        } else if (s[i] == ')') {
+            int start = openingParentheses.top();
+            openingParentheses.pop();
+            std::reverse(s.begin() + start + 1, s.begin() + i);
+        }
+    }
+
+    std::string result;
+    for (int i = 0; i < n; i++) {
+        if (s[i] != '(' && s[i] != ')') {
+            result += s[i];
+        }
+    }
+
+    return result;
+}",0,1.0
+Stack_7,1454585,2210103,"stack<int> stac;
+void rev(string& s, int start, int end);
+string pararev(string &s, int i);
+string parenthesesReversal(string s) {
+    // STUDENT ANSWER
+    return pararev(s, 0);
+}
+//void rev(string &s,int start,int end);
+string pararev(string &s, int i) {
+    //cout << i << endl;
+    //cout << s[i] << endl;
+    //cout << stac.size()<<endl;
+    if (s[i] == '\0') {
+        return s;
+    }
+    if (s[i] == '(') {
+        //cout << ""not ok"" << endl;
+        stac.push(i);
+        s.erase(i, 1);
+        return pararev(s, i);
+    }
+    else if (s[i] == ')') {
+        rev(s, stac.top(), i - 1);
+        s.erase(i, 1);
+        stac.pop();
+        return pararev(s, i);
+    }
+    return pararev(s, i + 1);
+}
+void rev(string& s, int start, int end) {
+    for (int i = start, j = end; i < j; i++, j--) {
+        char temp = s[i];
+        s[i] = s[j];
+        s[j] = temp;
+    }
+
+}",2,1.0
+Stack_7,1454587,2210535,"string parenthesesReversal(string s) {
+    stack<char> st;
+    string result("""");
+    int n = s.length();
+    for (int i = 0; i < n; i++) {
+        char temp = s[i];
+        if (temp == ')') {
+            string reversed("""");
+            while (!st.empty() && st.top() != '(') {
+                reversed += st.top();
+                st.pop();
+            }
+            if (!st.empty() && st.top() == '(') {
+                st.pop();
+            }
+            for (char c : reversed) {
+                st.push(c);
+            }
+        }
+        else    {
+            st.push(temp);
+        }
+    }
+    
+    while (!st.empty()) {
+        result = st.top() + result;
+        st.pop();
+    }
+    
+    return result;
+}",1,1.0
+Stack_7,1454594,2210578,"string parenthesesReversal(string s) {
+    stack<char> st;
+    for (char c : s) {
+        if (c == ')') {
+            string t = """";
+            while (!st.empty() && st.top() != '(') {
+                t += st.top();
+                st.pop();
+            }
+            if (!st.empty()) st.pop();  // pop the '('
+            for (char r : t) st.push(r);
+        } else {
+            st.push(c);
+        }
+    }
+
+    string result = """";
+    while (!st.empty()) {
+        result = st.top() + result;
+        st.pop();
+    }
+
+    return result;
+}",1,1.0
+Stack_7,1454649,2210034,"string parenthesesReversal(string s) {
+    stack<char> st;
+    for (char c : s) {
+        if (c == ')') {
+            string t = """";
+            while (!st.empty() && st.top() != '(') {
+                t += st.top();
+                st.pop();
+            }
+            st.pop();  // Remove the '(' from the stack
+            for (char r : t) {
+                st.push(r);
+            }
+        } else {
+            st.push(c);
+        }
+    }
+    string res = """";
+    while (!st.empty()) {
+        res = st.top() + res;
+        st.pop();
+    }
+    return res;
+}",1,1.0
+Stack_7,1454650,2213035,"string parenthesesReversal(string s) {
+    stack<char> st;
+    for (char c : s) {
+        if (c == ')') {
+            string temp = """";
+            while (!st.empty() && st.top() != '(') {
+                temp += st.top();
+                st.pop();
+            }
+            st.pop();
+            for (char cR : temp) {
+                st.push(cR);
+            }
+        }
+        else {
+            st.push(c);
+        }
+    }
+    string ans = """";
+    while (!st.empty()) {
+        ans = st.top() + ans;
+        st.pop();
+    }
+    return ans;
+}",1,1.0
+Stack_7,1454652,2212372,"string parenthesesReversal(string s) {
+    stack<char> st;
+
+    for (char c : s) {
+        if (c == ')') {
+            string temp = """";
+            while (!st.empty() && st.top() != '(') {
+                temp += st.top();
+                st.pop();
+            }
+
+            st.pop();
+
+            for (char cR : temp) {
+                st.push(cR);
+            }
+        }
+        else {
+            st.push(c);
+        }
+    }
+
+    string ans = """";
+    while (!st.empty()) {
+        ans = st.top() + ans;
+        st.pop();
+    }
+
+    return ans;
+}",1,1.0
+Stack_7,1454655,2211821,"string parenthesesReversal(string s) {
+    // STUDENT ANSWER
+    std::stack<int> openBrackets;
+    
+    for (int i = 0; i < int(s.length()); i++) {
+        if (s[i] == '(') {
+            openBrackets.push(i);
+        } else if (s[i] == ')') {
+            if (!openBrackets.empty()) {
+                int openIndex = openBrackets.top();
+                openBrackets.pop();
+                
+                // Reverse the substring between openIndex and i.
+                int left = openIndex + 1;
+                int right = i - 1;
+                while (left < right) {
+                    std::swap(s[left], s[right]);
+                    left++;
+                    right--;
+                }
+            }
+        }
+    }
+    
+    // Remove the brackets from the string.
+    std::string result = """";
+    for (int i = 0; i < int(s.length()); i++) {
+        if (s[i] != '(' && s[i] != ')') {
+            result += s[i];
+        }
+    }
+    
+    return result;
+}",0,1.0
+Stack_7,1454659,2212282,"string reverseString(string s, std::size_t start, std::size_t end) {
+    while (start < end) {
+        swap(s[start], s[end]);
+        start++;
+        end--;
+    }
+    return s;
+}
+
+string parenthesesReversal(string s) {
+    stack<std::size_t> st;
+    
+    for (std::size_t i = 0; i < s.length(); i++) {
+        if (s[i] == '(') {
+            st.push(i);
+        } else if (s[i] == ')') {
+            if (!st.empty()) {
+                std::size_t start = st.top() + 1;
+                std::size_t end = i - 1;
+                s = reverseString(s, start, end);
+                st.pop();
+            }
+        }
+    }
+    
+    string result;
+    for (char c : s) {
+        if (c != '(' && c != ')') {
+            result += c;
+        }
+    }
+    
+    return result;
+}",0,1.0
+Stack_7,1454661,2213248,"string parenthesesReversal(string s) {
+    // STUDENT ANSWER
+    stack<char> st;
+    string res ="""";
+    for(int i = s.size() - 1 ; i>=0 ; i--){
+        if(s[i]==')') st.push(s[i]);
+        else if(s[i]=='('){
+            string temp = """";
+            while(st.top()!=')'){
+                temp.push_back(st.top());
+                st.pop();
+            }
+            st.pop();
+            for(int j = 0 ; j<(int)temp.size() ;j++){
+                st.push(temp[j]);
+            }
+        }
+        else st.push(s[i]);
+    }
+    while(!st.empty()){
+        res+=st.top();
+        st.pop();
+    }
+    return res;
+}",1,1.0
+Stack_7,1454662,2210055,"string reverseString(string str) {
+    int n = str.length();
+    for (int i = 0; i < n / 2; i++) {
+        swap(str[i], str[n - i - 1]);
+    }
+    return str;
+}
+
+string parenthesesReversal(string s) {
+    stack<string> stk;
+    string result = """";
+
+    for (char c : s) {
+        if (c == '(') {
+            stk.push(result);
+            result = """";
+        } else if (c == ')') {
+            string reversed = reverseString(result);
+            if (!stk.empty()) {
+                result = stk.top() + reversed;
+                stk.pop();
+            } else {
+                result = reversed;
+            }
+        } else {
+            result += c;
+        }
+    }
+
+    return result;
+}",0,1.0
+Stack_7,1454665,2211878,"void reverse(string & s,int start, int end){
+    if(start >= end) return;
+    if(start < end){
+        char c = s[start];
+        s[start] = s[end];
+        s[end] = c;
+    }
+    reverse(s,start+1,end-1);
+}
+
+string parenthesesReversal(string s) {
+    stack<int> st;
+    for (unsigned int i = 0; i < s.size(); i++) {
+        if (s[i] == '(') {
+            st.push(i);
+        } else if (s[i] == ')') {
+            int start = st.top();
+            st.pop();
+            reverse(s,start + 1,i-1);
+        }
+    }
+    string result;
+    for (unsigned int i = 0; i < s.size(); i++) {
+        if (s[i] != '(' && s[i] != ')') {
+            result += s[i];
+        }
+    }
+    return result;
+}",0,1.0
+Stack_7,1454669,2213250,"string parenthesesReversal(string s) {
+    // STUDENT ANSWER
+    stack<char> st;
+    string res ="""";
+    for(int i = s.size() - 1 ; i>=0 ; i--){
+        if(s[i]==')') st.push(s[i]);
+        else if(s[i]=='('){
+            string temp = """";
+            while(st.top()!=')'){
+                temp.push_back(st.top());
+                st.pop();
+            }
+            st.pop();
+            for(int j = 0 ; j<(int)temp.size() ;j++){
+                st.push(temp[j]);
+            }
+        }
+        else st.push(s[i]);
+    }
+    while(!st.empty()){
+        res+=st.top();
+        st.pop();
+    }
+    return res;
+}",1,1.0
+Stack_7,1454675,2211667,"string parenthesesReversal(string s) {
+    stack<char> st;
+    for (char c : s) {
+        if (c != ')') {
+            st.push(c);
+        } else {
+            string t = """";
+            while (!st.empty() && st.top() != '(') {
+                t += st.top();
+                st.pop();
+            }
+            if (!st.empty()) st.pop(); // pop '('
+            for (char c : t) st.push(c);
+        }
+    }
+    string res = """";
+    while (!st.empty()) {
+        res = st.top() + res;
+        st.pop();
+    }
+    return res;
+}",1,1.0
+Stack_7,1454685,2110501,"void reverse(string& s, int start, int end) {
+    while (start < end) {
+        swap(s[start], s[end]);
+        start++;
+        end--;
+    }
+}
+
+string parenthesesReversal(string s) {
+    stack<int> st;
+    int len = s.length();
+    for (int i = 0; i < len; i++) {
+
+        if (s[i] == '(') {
+            st.push(i);
+        }
+
+        else if (s[i] == ')') {
+            reverse(s, st.top() + 1, i);
+            st.pop();
+        }
+    }
+
+     string res = """";
+    for (int i = 0; i < len; i++) {
+        if (s[i] != ')' && s[i] != '(')
+            res += s[i];
+    }
+    return res;
+}",0,1.0
+Stack_7,1454710,2212935,"string parenthesesReversal(string s) {
+    // STUDENT ANSWER
+     stack<int> st;
+    int n = s.length();
+
+    for (int i = 0; i < n; i++) {
+        if (s[i] == '(') {
+            st.push(i);
+        } 
+        else if (s[i] == ')') {
+            int start = st.top();
+            st.pop();
+
+            int left = start + 1;
+            int right = i - 1;
+            while (left < right) {
+                swap(s[left], s[right]);
+                left++;
+                right--;
+            }
+        }
+    }
+
+    string result;
+    for (int i = 0; i < n; i++) {
+        if (s[i] != '(' && s[i] != ')') {
+            result += s[i];
+        }
+    }
+
+    return result;
+}",0,1.0
+Stack_7,1454732,2212651,"void reverseString(string &s, int start, int end){
+    stack<char> st;
+    for(int i=start;i<=end;i++){
+        st.push(s[i]);
+    }
+    for(int i= start; i<=end;i++){
+        s[i]=st.top();
+        st.pop();
+    }
+}
+string parenthesesReversal(string s) {
+    // STUDENT ANSWER
+    string res="""";
+    stack<int> st;
+    for(int i=0;i<(int)s.length();i++){
+        if(s[i]=='('){
+            st.push(i);
+        }
+        else if(s[i]==')'){
+            reverseString(s,st.top()+1,i-1);
+            st.pop();
+        }
+    }
+    for(int i=0;i<(int)s.length();i++){
+        if(s[i]=='('||s[i]==')') continue;
+        res+=s[i];
+    }
+    return res;
+}",0,1.0
+Stack_7,1454736,2213298,"string parenthesesReversal(string s) {
+    // STUDENT ANSWER
+    stack<char> st;
+    for (char c : s) {
+        if (c == ')') {
+            string temp = """";
+            while (!st.empty() && st.top() != '(') {
+                temp += st.top();
+                st.pop();
+            }
+            if (!st.empty()) st.pop();
+            for (char t : temp) st.push(t);
+        }
+        else st.push(c);
+    }
+    string result = """";
+    while (!st.empty()) {
+        result = st.top() + result;
+        st.pop();
+    }
+    return result;
+} ";1;1.0
+Stack_7,1454803,2210532,"void ReverseSubstring(string& s, int start, int end) {
+    while (start < end) {
+        swap(s[start], s[end]);
+        start++;
+        end--;
+    }
+}
+
+string parenthesesReversal(string& s) {
+    stack<int> st;
+    int n = s.size();
+    for (int i = 0; i < n; i++) {
+        if (s[i] == '(') {
+            st.push(i);
+        } else if (s[i] == ')') {
+            if (!st.empty()) {
+                int openIndex = st.top();
+                st.pop();
+                ReverseSubstring(s, openIndex + 1, i - 1);
+            }
+        }
+    }
+    string result;
+    for (char c : s) {
+        if (c != '(' && c != ')') {
+            result += c;
+        }
+    }
+    return result;
+}",0,1.0
+Stack_7,1454923,2211367,"void reverse(std::string& s, int start, int end) {
+    while (start < end) {
+        char tmp = s[start];
+        s[start] = s[end];
+        s[end] = tmp;
+        start++;
+        end--;
+    }
+}
+
+std::string reverseParentheses(std::string str, int len) {
+    std::stack<int> st;
+
+    for (int i = 0; i < len; i++) {
+        if (str[i] == '(') {
+            st.push(i);
+        } else if (str[i] == ')') {
+            int start = st.top() + 1;
+            int end = i - 1;
+            st.pop();
+            reverse(str, start, end);
+        }
+    }
+
+    std::string res = """";
+    for (int i = 0; i < len; i++) {
+        if (str[i] != ')' && str[i] != '(')
+            res += str[i];
+    }
+
+    return res;
+}
+
+
+string parenthesesReversal(string s) {
+    return reverseParentheses(s,s.length());
+    // STUDENT ANSWER
+}",0,1.0
+Stack_7,1455019,2212499,"string parenthesesReversal(string s) {
+stack<char> st;
+    for (char c : s) {
+        if (c == ')') {
+            string t = """";
+            while (!st.empty() && st.top() != '(') {
+                t += st.top();
+                st.pop();
+            }
+            if (!st.empty()) st.pop(); // pop the '('
+            for (char r : t) st.push(r);
+        } else {
+            st.push(c);
+        }
+    }
+    string res = """";
+    while (!st.empty()) {
+        res = st.top() + res;
+        st.pop();
+    }
+    return res;}",1,1.0
+Stack_7,1455121,2213836,"string parenthesesReversal(string s) {
+    // STUDENT ANSWER
+    stack<char> st;
+    for(char c : s) {
+        if(c == ')') {
+            string t = """";
+            while (!st.empty() && st.top() != '(') {
+                t += st.top();
+                st.pop();
+            } 
+            if(!st.empty()) st.pop(); // pop '('
+            for(char r : t) st.push(r);
+        }
+        else st.push(c);
+    }
+    string res = """";
+    while(!st.empty()) {
+        res = st.top() + res;
+        st.pop();
+    }
+    return res;
+}",1,1.0
+Stack_7,1501583,2252260,"string parenthesesReversal(string s) {
+    // STUDENT ANSWER
+    stack<char> st;
+    for (char c : s) {
+        if (c == ')') {
+            string t = """";
+            while (!st.empty() && st.top() != '(') {
+                t += st.top();
+                st.pop();
+            }
+            if (!st.empty()) st.pop(); // pop '('
+            for (char r : t) st.push(r);
+        } else {
+            st.push(c);
+        }
+    }
+    string res = """";
+    while (!st.empty()) {
+        res = st.top() + res;
+        st.pop();
+    }
+    return res;
+}",1,1.0
+Stack_7,1520666,2212741,"string parenthesesReversal(string s) {
+    // STUDENT ANSWER
+     stack<char> st;
+    for(char c: s){
+        if( c ==')'){
+            string t= """";
+            while( !st.empty() && st.top() !='('){
+                t += st.top();
+                st.pop();
+            }
+            if( !st.empty() ) st.pop();
+            for( char r : t) st.push(r);
+        }
+        else{
+            st.push(c);
+        }
+    }
+    
+    string res="""";
+    while( !st.empty()){
+        res= st.top() + res;
+        st. pop();
+    }
+    return res;
+
+}",1,1.0
+Stack_7,1521743,2211738,"string parenthesesReversal(string s) {
+    // STUDENT ANSWER
+    stack<char> st;
+
+    for (char c : s) {
+        if (c == ')') {
+            string temp = """";
+            while (!st.empty() && st.top() != '(') {
+                temp += st.top();
+                st.pop();
+            }
+
+            st.pop();
+
+            for (char cR : temp) {
+                st.push(cR);
+            }
+        }
+        else {
+            st.push(c);
+        }
+    }
+
+    string ans = """";
+    while (!st.empty()) {
+        ans = st.top() + ans;
+        st.pop();
+    }
+
+    return ans;
+}",1,1.0
+Stack_7,1525055,2212935,"string parenthesesReversal(string s) {
+    // STUDENT ANSWER
+    stack <int> st;
+    int n = s.length();
+    for (int i = 0; i < n; i++){
+        if (s[i] == '('){
+            st.push(i);
+        }
+        else if (s[i] == ')'){
+            int start = st.top();
+            st.pop();
+            int end = i - 1;
+            while (start < end){
+                swap(s[start], s[end]);
+                start++;
+                end--;
+            }
+        }
+    }
+    string result = """";
+   for (int i = 0; i < n; i++) {
+        if (s[i] != '(' && s[i] != ')') {
+            result += s[i];
+        }
+    }
+    return result;
+}",0,1.0
+Stack_7,1528061,1912532,"string parenthesesReversal(string s) {
+    stack<char> charStack;
+
+    for (char c : s) {
+        if (c == ')') {
+            // Pop characters from the stack and reverse them until an opening parenthesis is encountered.
+            string reversed;
+            while (!charStack.empty() && charStack.top() != '(') {
+                reversed += charStack.top();
+                charStack.pop();
+            }
+            
+            // Pop the opening parenthesis.
+            charStack.pop();
+
+            // Push the reversed characters back into the stack.
+            for (char rc : reversed) {
+                charStack.push(rc);
+            }
+        } else {
+            // Push other characters onto the stack.
+            charStack.push(c);
+        }
+    }
+
+    // Construct the result string from the characters left in the stack.
+    string result;
+    while (!charStack.empty()) {
+        result = charStack.top() + result;
+        charStack.pop();
+    }
+
+    return result;
+}
+";1;1.0
+Stack_7,1531631,2210055,"void reverse(string& str, int start, int end) {
+    while (start < end) {
+        char temp = str[start];
+        str[start] = str[end];
+        str[end] = temp;
+        start++;
+        end--;
+    }
+}
+
+string parenthesesReversal(string str) {
+    stack<int> st;
+    int len = str.length();
+    for (int i = 0; i < len; i++) {
+        if (str[i] == '(') {
+            st.push(i);
+        }
+        else if (str[i] == ')') {
+            reverse(str, st.top() + 1, i - 1);
+            st.pop();
+        }
+    }
+    std::string res = """";
+    for (int i = 0; i < len; i++) {
+        if (str[i] != ')' && str[i] != '(')
+            res += str[i];
+    }
+    return res;
+}",0,1.0
+Stack_7,1531756,2210535,"string parenthesesReversal(string s) {
+    stack<char> st;
+    string result("""");
+    int n = s.length();
+    for (int i = 0; i < n; i++) {
+        char temp = s[i];
+        if (temp == ')') {
+            string reversed("""");
+            while (!st.empty() && st.top() != '(') {
+                reversed += st.top();
+                st.pop();
+            }
+            if (!st.empty() && st.top() == '(') {
+                st.pop();
+            }
+            for (char c : reversed) {
+                st.push(c);
+            }
+        }
+        else    {
+            st.push(temp);
+        }
+    }
+    
+    while (!st.empty()) {
+        result = st.top() + result;
+        st.pop();
+    }
+    
+    return result;
+}",1,1.0
+Stack_7,1532367,2211738,"string parenthesesReversal(string s) {
+    // STUDENT ANSWER
+    stack<char> st;
+
+    for (char c : s) {
+        if (c == ')') {
+            string temp = """";
+            while (!st.empty() && st.top() != '(') {
+                temp += st.top();
+                st.pop();
+            }
+
+            st.pop();
+
+            for (char cR : temp) {
+                st.push(cR);
+            }
+        }
+        else {
+            st.push(c);
+        }
+    }
+
+    string ans = """";
+    while (!st.empty()) {
+        ans = st.top() + ans;
+        st.pop();
+    }
+
+    return ans;
+}",1,1.0
+Stack_7,1532388,2211878,"string reverseString(string s) {
+    int n = s.size();
+    for (int i = 0; i < n / 2; i++) {
+        swap(s[i], s[n - i - 1]);
+    }
+    return s;
+}
+
+string parenthesesReversal(string s) {
+    stack<int> st;
+    int n = s.size();
+    for (int i = 0; i < n; i++) {
+        if (s[i] == '(') {
+            st.push(i);
+        } else if (s[i] == ')') {
+            int start = st.top() + 1;
+            int end = i - 1;
+            st.pop();
+            string reversed = reverseString(s.substr(start, end - start + 1));
+            s.replace(start, end - start + 1, reversed);
+            n -= (end - start + 1) - reversed.size();
+            i -= (end - start + 1) - reversed.size();
+        }
+    }
+    string result = """";
+    for (int i = 0; i < n; i++) {
+        if (s[i] != '(' && s[i] != ')') {
+            result += s[i];
+        }
+    }
+    return result;
+}",0,1.0
+Stack_7,1532463,1912532,"string parenthesesReversal(string s) {
+    stack<char> charStack;
+
+    for (char c : s) {
+        if (c == ')') {
+            // Pop characters from the stack and reverse them until an opening parenthesis is encountered.
+            string reversed;
+            while (!charStack.empty() && charStack.top() != '(') {
+                reversed += charStack.top();
+                charStack.pop();
+            }
+            
+            // Pop the opening parenthesis.
+            charStack.pop();
+
+            // Push the reversed characters back into the stack.
+            for (char rc : reversed) {
+                charStack.push(rc);
+            }
+        } else {
+            // Push other characters onto the stack.
+            charStack.push(c);
+        }
+    }
+
+    // Construct the result string from the characters left in the stack.
+    string result;
+    while (!charStack.empty()) {
+        result = charStack.top() + result;
+        charStack.pop();
+    }
+
+    return result;
+}",1,1.0
+Stack_7,1536183,2210034,"string parenthesesReversal(string s) {
+    stack<char> st;
+    for (char c : s) {
+        if (c == ')') {
+            string t = """";
+            while (!st.empty() && st.top() != '(') {
+                t += st.top();
+                st.pop();
+            }
+            st.pop();  // Remove the '(' from the stack
+            for (char r : t) {
+                st.push(r);
+            }
+        } else {
+            st.push(c);
+        }
+    }
+    string res = """";
+    while (!st.empty()) {
+        res = st.top() + res;
+        st.pop();
+    }
+    return res;
+}",1,1.0
+Stack_7,1536579, ,"string parenthesesReversal(string s) {
+    stack<char> st;
+    for (char c : s) {
+        if (c == ')') {
+            string t = """";
+            while (!st.empty() && st.top() != '(') {
+                t += st.top();
+                st.pop();
+            }
+            st.pop();  // Remove the '(' from the stack
+            for (char r : t) {
+                st.push(r);
+            }
+        } else {
+            st.push(c);
+        }
+    }
+    string res = """";
+    while (!st.empty()) {
+        res = st.top() + res;
+        st.pop();
+    }
+    return res;
+}",1,1.0
+Stack_7,1536618,2211170,"string parenthesesReversal(string s) {
+    stack<char> st;
+    int n = s.length();
+    for(int i = 0; i < n; i++) {
+        char ch = s[i];
+        if(ch == '(' || ch != ')') {
+            st.push(ch);
+        }
+
+        if(ch == ')' && !st.empty()) {
+            string temp = """";
+            while(st.top() != '(') {
+                temp += st.top();
+                st.pop();
+            }
+            st.pop();
+
+            int m = temp.length();
+
+            if(st.empty() && i == n - 1) {
+                return temp;
+            } else {
+                for(int i = 0; i < m; i++) {
+                    st.push(temp[i]);
+                }
+            }
+        }
+    }
+
+    stack<char> rev;
+    while(!st.empty()) {
+        rev.push(st.top());
+        if(st.top() == '(' || st.top() == ')') {
+            return """";
+        }
+        st.pop();
+    }
+
+    string ans = """";
+    while(!rev.empty()) {
+        ans.push_back(rev.top());
+        rev.pop();
+    }
+    return ans;
+}",1,1.0

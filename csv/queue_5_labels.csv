@@ -1,0 +1,2086 @@
+problem_slug,submission_id,student_code,code,labels,score
+Queue_5,1454635,2210458,"int dx[] = {1, -1, 0, 0};
+int dy[] = {0, 0, 1, -1};
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int sec = 0;
+    int freshApple = 0;
+    int n = grid.size();
+    int m = grid[0].size();
+    vector<vector<int>> vis(n, vector<int>(m, 0));
+    
+    queue<pair<int, int>> q;
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) {
+            if(grid[i][j] == 1) freshApple++;
+            else if(grid[i][j] == 2) q.push({i, j});
+        }
+    }
+    
+    while(!q.empty()) {
+        int rottenApple = q.size();
+        while(rottenApple--) {
+            int x = q.front().first;
+            int y = q.front().second;
+            q.pop();
+            vis[x][y] = 1;
+            
+            
+            for(int i = 0; i < 4; i++) {
+                int u = x + dx[i];
+                int v = y + dy[i];
+                
+                if(u < 0 || v < 0 || u >= n || v >= m) continue;
+                if(vis[u][v]) continue;
+                if(grid[u][v] == 0 || grid[u][v] == 2) continue;
+                
+                freshApple--;
+                grid[u][v] = 2;
+                q.push({u, v});
+            }
+            
+        }
+        if(!q.empty()) sec++;
+    }
+    if(freshApple > 0) return -1;
+    return sec;
+}",0,1.0
+Queue_5,1454688,2110501,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+    int m = grid[0].size();
+    
+    // Define the four possible directions to move: up, down, left, and right
+    vector<int> dx = {1, -1, 0, 0};
+    vector<int> dy = {0, 0, 1, -1};
+
+    // Create a queue for BFS
+    queue<pair<int, int>> q;
+
+    // Initialize the time and count of fresh apples
+    int time = 0;
+    int freshApples = 0;
+
+    // Initialize the queue with rotten apples and count fresh apples
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (grid[i][j] == 1) {
+                freshApples++;
+            }
+            else if (grid[i][j] == 2) {
+                q.push({i, j});
+            }
+        }
+    }
+
+    while (!q.empty() && freshApples > 0) {
+        int size = q.size();
+        for (int i = 0; i < size; i++) {
+            int x = q.front().first;
+            int y = q.front().second;
+            q.pop();
+
+            for (int k = 0; k < 4; k++) {
+                int nx = x + dx[k];
+                int ny = y + dy[k];
+
+                if (nx >= 0 && ny >= 0 && nx < n && ny < m && grid[nx][ny] == 1) {
+                    grid[nx][ny] = 2;
+                    freshApples--;
+                    q.push({nx, ny});
+                }
+            }
+        }
+        time++;
+    }
+
+    return freshApples == 0 ? time : -1;
+}",0,1.0
+Queue_5,1455292,2211876,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int rows = grid.size();
+    int cols = grid[0].size();
+    int freshApples = 0;
+    int rottenApples = 0;
+
+    std::queue<std::pair<int, int>> q;  
+    std::vector<std::pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};  // 4 possible directions.
+
+   
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (grid[i][j] == 2) {
+                q.push({i, j});
+            } else if (grid[i][j] == 1) {
+                freshApples++;
+            }
+        }
+    }
+
+    int time = 0;
+
+    while (!q.empty()) {
+        int size = q.size();  
+        bool rottenThisRound = false;
+
+        for (int i = 0; i < size; i++) {
+            int x = q.front().first;
+            int y = q.front().second;
+            q.pop();
+
+            for (const auto& dir : directions) {
+                int newX = x + dir.first;
+                int newY = y + dir.second;
+
+                if (newX >= 0 && newX < rows && newY >= 0 && newY < cols && grid[newX][newY] == 1) {
+                    grid[newX][newY] = 2;  
+                    q.push({newX, newY});
+                    rottenApples++;
+                    rottenThisRound = true;
+                }
+            }
+        }
+
+        if (rottenThisRound) {
+            time++;
+        }
+    }
+
+    
+    if (rottenApples == freshApples) {
+        return time;
+    } else {
+        return -1;
+    }
+}",0,1.0
+Queue_5,1455293,2213298,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int rows = grid.size();
+    int cols = grid[0].size();
+    queue<pair<int, int>> rotten;
+    int fresh = 0;
+    int time = 0;
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            if (grid[i][j] == 2) {
+                rotten.push({i, j});
+            } else if (grid[i][j] == 1) {
+                fresh++;
+            }
+        }
+    }
+    vector<pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    while (!rotten.empty() && fresh > 0) {
+        int size = rotten.size();
+        for (int i = 0; i < size; ++i) {
+            pair<int, int> pos = rotten.front();
+            rotten.pop();
+
+            for (pair<int, int>& dir : directions) {
+                int x = pos.first + dir.first;
+                int y = pos.second + dir.second;
+                if (x < 0 || y < 0 || x >= rows || y >= cols || grid[x][y] != 1) continue;
+                grid[x][y] = 2;
+                rotten.push({x, y});
+                fresh--;
+            }
+        }
+        time++;
+    }
+
+    return fresh == 0 ? time : -1;
+}",0,1.0
+Queue_5,1455294,2210578,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+    int m = grid[0].size();
+    queue<pair<int, int>> q;
+    int freshApples = 0;
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) {
+            if(grid[i][j] == 2) {
+                q.push({i, j});
+            } else if(grid[i][j] == 1) {
+                freshApples++;
+            }
+        }
+    }
+    int time = 0;
+    vector<pair<int, int>> directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+    while(!q.empty() && freshApples) {
+        time++;
+        int sz = q.size();
+        while(sz--) {
+            pair<int, int> cur = q.front();
+            q.pop();
+            for(pair<int, int>& dir : directions) {
+                int x = cur.first + dir.first;
+                int y = cur.second + dir.second;
+                if(x < 0 || y < 0 || x >= n || y >= m || grid[x][y] != 1) continue;
+                grid[x][y] = 2;
+                q.push({x, y});
+                freshApples--;
+            }
+        }
+    }
+    return freshApples ? -1 : time;
+
+}",0,1.0
+Queue_5,1455295,2112585,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+    int m = grid[0].size();
+    int freshApples = 0;
+    queue<pair<int, int>> rottenQueue;
+
+    // Count the number of fresh apples and add rotten apples to the queue
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (grid[i][j] == 1) {
+                freshApples++;
+            } else if (grid[i][j] == 2) {
+                rottenQueue.push({i, j});
+            }
+        }
+    }
+
+    int seconds = 0;
+    vector<pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+    while (!rottenQueue.empty()) {
+        int size = rottenQueue.size();
+
+        for (int i = 0; i < size; i++) {
+            int x = rottenQueue.front().first;
+            int y = rottenQueue.front().second;
+            rottenQueue.pop();
+
+            for (auto dir : directions) {
+                int nx = x + dir.first;
+                int ny = y + dir.second;
+
+                if (nx >= 0 && nx < n && ny >= 0 && ny < m && grid[nx][ny] == 1) {
+                    grid[nx][ny] = 2;
+                    freshApples--;
+                    rottenQueue.push({nx, ny});
+                }
+            }
+        }
+
+        if (!rottenQueue.empty()) {
+            seconds++;
+        }
+    }
+
+    return freshApples == 0 ? seconds : -1;
+}",0,1.0
+Queue_5,1455299,2213035,"int secondsToBeRotten(vector<vector<int>> &grid)
+{
+    int rows = grid.size();
+    int colums = grid[0].size();
+    int seconds = 0;
+    queue<pair<int, int>> rotten;
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < colums; j++)
+        {
+            if (grid[i][j] == 2)
+            {
+                rotten.push({i, j});
+            }
+        }
+    }
+
+    while (!rotten.empty())
+    {
+        int size = rotten.size();
+        for (int i = 0; i < size; i++)
+        {
+            pair<int, int> current = rotten.front();
+            rotten.pop();
+
+            int x = current.first;
+            int y = current.second;
+
+            if (x + 1 < rows && grid[x + 1][y] == 1)
+            {
+                grid[x + 1][y] = 2;
+                rotten.push({x + 1, y});
+            }
+            if (x - 1 >= 0 && grid[x - 1][y] == 1)
+            {
+                grid[x - 1][y] = 2;
+                rotten.push({x - 1, y});
+            }
+            if (y + 1 < colums && grid[x][y + 1] == 1)
+            {
+                grid[x][y + 1] = 2;
+                rotten.push({x, y + 1});
+            }
+            if (y - 1 >= 0 && grid[x][y - 1] == 1)
+            {
+                grid[x][y - 1] = 2;
+                rotten.push({x, y - 1});
+            }
+        }
+        if (!rotten.empty())
+        {
+            seconds++;
+        }
+    }
+
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < colums; j++)
+        {
+            if (grid[i][j] == 1)
+            {
+                return -1;
+            }
+        }
+    }
+
+    return seconds;
+}",1,1.0
+Queue_5,1455300,2211667,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+    int m = grid[0].size();
+    queue<pair<int, int>> q;
+    int freshApples = 0;
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) {
+            if(grid[i][j] == 2) {
+                q.push({i, j});
+            } else if(grid[i][j] == 1) {
+                freshApples++;
+            }
+        }
+    }
+    int time = 0;
+    vector<vector<int>> dirs = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+    while(!q.empty() && freshApples) {
+        int sz = q.size();
+        while(sz--) {
+            pair<int, int> cur = q.front(); 
+            q.pop();
+            for(auto& dir : dirs) {
+                int x = cur.first + dir[0];
+                int y = cur.second + dir[1];
+                if(x < 0 || y < 0 || x >= n || y >= m || grid[x][y] != 1)
+                    continue;
+                grid[x][y] = 2;
+                q.push({x, y});
+                freshApples--;
+            }
+        }
+        time++;
+    }
+    return freshApples ? -1 : time;
+}",0,1.0
+Queue_5,1455301,2212282,"int secondsToBeRotten(vector<vector<int>>& grid) {
+    int rows = grid.size();
+    int cols = grid[0].size();
+    
+    queue<pair<int, int>> rottenApples;
+    int freshApplesCount = 0;
+    
+    // Find initial rotten apples and count fresh apples
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (grid[i][j] == 2) {
+                rottenApples.push({i, j});
+            } else if (grid[i][j] == 1) {
+                freshApplesCount++;
+            }
+        }
+    }
+    
+    int seconds = 0;
+    int rottenCount = 0;
+    vector<pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    
+    // Perform BFS to rot fresh apples
+    while (!rottenApples.empty() && freshApplesCount > 0) {
+        int size = rottenApples.size();
+        rottenCount += size;
+        
+        while (size--) {
+            int x = rottenApples.front().first;
+            int y = rottenApples.front().second;
+            rottenApples.pop();
+            
+            for (auto& dir : directions) {
+                int newX = x + dir.first;
+                int newY = y + dir.second;
+                
+                if (newX >= 0 && newX < rows && newY >= 0 && newY < cols && grid[newX][newY] == 1) {
+                    grid[newX][newY] = 2;
+                    rottenApples.push({newX, newY});
+                    freshApplesCount--;
+                }
+            }
+        }
+        
+        seconds++;
+    }
+    
+    return freshApplesCount == 0 ? seconds : -1;
+}",0,1.0
+Queue_5,1455312,2212372,"int secondsToBeRotten(vector<vector<int>>& grid) {
+    int m = grid.size();
+    int n = grid[0].size();
+
+    queue<vector<int>> q;
+    int beforeRotten = 0;
+
+    for (int i=0; i<m; i++) {
+        for (int j=0; j<n; j++) {
+            if (grid[i][j] == 1) {
+                beforeRotten += 1;
+            }
+            else if (grid[i][j] == 2) {
+                vector<int> info = {i, j, 0};
+                q.push(info);
+            }
+        }
+    }
+
+    int dRow[4] = {0, -1, 0, 1};
+    int dCol[4] = {-1, 0, 1, 0};
+    int afterRotten = 0;
+    int sec = 0;
+
+    while (!q.empty()) {
+        vector<int> orange = q.front();
+        q.pop();
+        int nthSec = orange[2];
+        sec = (sec>nthSec)?sec:nthSec;
+
+        for (int i=0; i<4; i++) {
+            int row = orange[0] + dRow[i];
+            int col = orange[1] + dCol[i];
+
+            if (row >= 0 && row < m && col >= 0 && col < n) {
+                if (grid[row][col] == 1) {
+                    afterRotten += 1;
+                    grid[row][col] = 2;
+                    vector<int> info = {row, col, nthSec + 1};
+                    q.push(info);
+                }
+            }
+        }
+    }
+
+    return beforeRotten == afterRotten ? sec : -1;
+}",0,1.0
+Queue_5,1455315,2212935,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int rows = grid.size();
+    int cols = grid[0].size();
+    vector<int> dx = {-1, 1, 0, 0};
+    vector<int> dy = {0, 0, -1, 1};
+
+    queue<pair<int, int>> rottenApples;
+    int freshApples = 0;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (grid[i][j] == 2) {
+                rottenApples.push({i, j});
+            } else if (grid[i][j] == 1) {
+                freshApples++;
+            }
+        }
+    }
+
+    int minutes = 0; 
+
+    while (!rottenApples.empty()) {
+        int size = rottenApples.size();
+        for (int i = 0; i < size; i++) {
+            int x = rottenApples.front().first;
+            int y = rottenApples.front().second;
+            rottenApples.pop();
+
+
+            for (int j = 0; j < 4; j++) {
+                int newX = x + dx[j];
+                int newY = y + dy[j];
+
+
+                if (newX >= 0 && newX < rows && newY >= 0 && newY < cols && grid[newX][newY] == 1) {
+                    // Mark the fresh apple as rotten
+                    grid[newX][newY] = 2;
+                    freshApples--;
+                    rottenApples.push({newX, newY});
+                }
+            }
+        }
+
+        if (!rottenApples.empty()) {
+            minutes++; 
+        }
+    }
+
+
+    if (freshApples > 0) {
+        return -1;
+    }
+
+    return minutes;
+}",0,1.0
+Queue_5,1455318,2213250,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+    int m = grid[0].size();
+    queue<pair<int,int>> q;
+    for(int i=0 ; i < n ; i++){
+        for(int j = 0 ; j<m;j++){
+            if(grid[i][j]==2) q.push({i,j});
+        }
+    }
+    int sec = 0 ;
+    while(!q.empty()){
+        int s = q.size();
+        //cout<<s<<endl;
+        bool check = true;
+        for(int i=0 ; i < n ; i++){
+            for(int j = 0 ; j <m ; j++){
+                if(grid[i][j]==1) check = false;
+            }
+        }
+        if(check) break;
+        for(int i = 0 ; i<s ; i++ ){
+            int x = q.front().first;
+            int y = q.front().second;
+            q.pop();
+            if(x+1<n && grid[x+1][y]==1){
+                q.push({x+1,y});
+                grid[x+1][y] = 2;
+            }
+            if(y+1<m && grid[x][y+1]==1){
+                q.push({x,y+1});
+                grid[x][y+1] = 2;
+            }
+            if(x-1>=0 && grid[x-1][y]==1){
+                q.push({x-1,y});
+                grid[x-1][y] = 2;
+            }
+            if(y-1>=0 && grid[x][y-1]==1){
+                q.push({x,y-1});
+                grid[x][y-1] = 2;
+            }
+        }
+        sec++;
+    }
+    for(int i=0 ; i<n;i++){
+        for(int j = 0 ; j< m ; j++){
+            if(grid[i][j]==1) return -1;
+        }
+    }
+    return sec;
+}",1,1.0
+Queue_5,1455319,2211878,"int secondsToBeRotten(vector<vector<int>>& grid) {
+    int rows = grid.size();
+    int cols = grid[0].size();
+    queue<pair<int, int>> q;
+    int freshApples = 0;
+    for(int i = 0; i < rows; i++) {
+        for(int j = 0; j < cols; j++) {
+            if(grid[i][j] == 2) q.push({i, j});
+            else if(grid[i][j] == 1) freshApples++;
+        }
+    }
+    if(freshApples == 0) return 0;
+    int time = -1;
+    vector<pair<int, int>> directions{{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    while(!q.empty()) {
+        int size = q.size();
+        for(int i = 0; i < size; i++) {
+            auto curr = q.front();
+            q.pop();
+            for(auto dir : directions) {
+                int x = curr.first + dir.first;
+                int y = curr.second + dir.second;
+                if(x >= 0 && x < rows && y >= 0 && y < cols && grid[x][y] == 1) {
+                    grid[x][y] = 2;
+                    q.push({x, y});
+                    freshApples--;
+                }
+            }
+        }
+        time++;
+    }
+    return freshApples == 0 ? time : -1;
+}",0,1.0
+Queue_5,1455323,2210103,"int secondsToBeRotten(vector<vector<int>>& grid) {
+    int rows = grid.size();
+    int cols = grid[0].size();
+    queue<pair<int, int>> q;
+    int fresh = 0;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (grid[i][j] == 2)
+                q.push({ i,j });
+            if (grid[i][j] == 1)
+                fresh++;
+        }
+    }
+    if (fresh == 0) return 0;
+    vector<vector<int>> dir = { {-1, 0}, {1, 0}, {0, -1}, {0, 1} };
+    int time = -1;
+    while (!q.empty()) {
+        time++;
+        int sz = q.size();
+        while (sz--) {
+            pair<int, int> p = q.front();
+            q.pop();
+            for (auto& d : dir) {
+                int ni = p.first + d[0];
+                int nj = p.second + d[1];
+                if (ni >= 0 && nj >= 0 && ni < rows && nj < cols && grid[ni][nj] == 1) {
+                    grid[ni][nj] = 2;
+                    q.push({ ni,nj });
+                    fresh--;
+                }
+            }
+        }
+    }
+    if (fresh > 0) return -1;
+    return time;
+    return 0;
+}",0,1.0
+Queue_5,1455326,2212303,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+       int n = grid.size();
+    int m = grid[0].size();
+
+    std::queue<std::pair<int, int>> rottenApples;
+    int freshApples = 0;
+    int minutes = -1;
+
+    // Count fresh apples and add rotten apples to the queue.
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (grid[i][j] == 2) {
+                rottenApples.push({i, j});
+            } else if (grid[i][j] == 1) {
+                freshApples++;
+            }
+        }
+    }
+
+    // Define possible directions for rotting apples.
+    std::vector<std::pair<int, int>> directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+
+    while (!rottenApples.empty()) {
+        int size = rottenApples.size();
+        minutes++;
+
+        for (int i = 0; i < size; i++) {
+            int x = rottenApples.front().first;
+            int y = rottenApples.front().second;
+            rottenApples.pop();
+
+            for (const auto& dir : directions) {
+                int newX = x + dir.first;
+                int newY = y + dir.second;
+
+                if (newX >= 0 && newX < n && newY >= 0 && newY < m && grid[newX][newY] == 1) {
+                    grid[newX][newY] = 2;
+                    freshApples--;
+                    rottenApples.push({newX, newY});
+                }
+            }
+        }
+    }
+
+    if (freshApples == 0) {
+        return minutes;
+    } else {
+        return -1; // There are fresh apples that cannot be rotten.
+    }
+}",0,1.0
+Queue_5,1455332,2210034,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+    int m = grid[0].size();
+    queue<pair<int, int>> q;
+    int fresh = 0;
+
+    // Add the position of all rotten apples to the queue
+    // Count the number of fresh apples
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            if (grid[i][j] == 2) {
+                q.push({i, j});
+            } else if (grid[i][j] == 1) {
+                ++fresh;
+            }
+        }
+    }
+
+    // Directions for the adjacent cells
+    vector<vector<int>> dirs {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    int time = 0;
+
+    while (!q.empty() && fresh > 0) {
+        ++time;
+        int sz = q.size();
+        while (sz--) {
+            pair<int, int> p = q.front();
+            q.pop();
+
+            for (vector<int>& dir : dirs) {
+                int x = p.first + dir[0];
+                int y = p.second + dir[1];
+
+                if (x < 0 || y < 0 || x >= n || y >= m || grid[x][y] != 1) continue;
+                --fresh;
+                grid[x][y] = 2;
+                q.push({x, y});
+            }
+        }
+    }
+
+    return fresh == 0 ? time : -1;
+}",0,1.0
+Queue_5,1455338,2211170,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int rows = grid.size();
+    int cols = grid[0].size();
+
+    // Define directions for adjacent cells
+    vector<int> dx = {-1, 0, 1, 0};
+    vector<int> dy = {0, 1, 0, -1};
+
+    // Initialize a queue to store the coordinates of rotten apples
+    queue<pair<int, int>> rottenQueue;
+
+    int freshApples = 0; // Count of fresh apples
+
+    // Enqueue the coordinates of rotten apples and count the fresh apples
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (grid[i][j] == 2)
+                rottenQueue.push({i, j});
+            else if (grid[i][j] == 1)
+                freshApples++;
+        }
+    }
+
+    int minutes = 0; // Time in minutes
+
+    // Perform BFS
+    while (!rottenQueue.empty() && freshApples > 0) {
+        int size = rottenQueue.size();
+
+        for (int i = 0; i < size; i++) {
+            int x = rottenQueue.front().first;
+            int y = rottenQueue.front().second;
+            rottenQueue.pop();
+
+            // Check the adjacent cells
+            for (int j = 0; j < 4; j++) {
+                int newX = x + dx[j];
+                int newY = y + dy[j];
+
+                // If the adjacent cell is within the grid and contains a fresh apple
+                if (newX >= 0 && newX < rows && newY >= 0 && newY < cols && grid[newX][newY] == 1) {
+                    // Mark the apple as rotten and enqueue its coordinates
+                    grid[newX][newY] = 2;
+                    rottenQueue.push({newX, newY});
+                    freshApples--;
+                }
+            }
+        }
+
+        if (!rottenQueue.empty())
+            minutes++; // Increment time in minutes
+    }
+
+    // If there are still fresh apples remaining, it's not possible to rot all apples
+    if (freshApples > 0)
+        return -1;
+
+    return minutes;
+}",0,1.0
+Queue_5,1455340,2210055,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+  int m = grid[0].size();
+
+  // Create a queue to store the coordinates of the rotten apples.
+  queue<pair<int, int>> rottenApplesQueue;
+
+  // Initialize the queue with the coordinates of all the rotten apples.
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < m; j++) {
+      if (grid[i][j] == 2) {
+        rottenApplesQueue.push({i, j});
+      }
+    }
+  }
+
+  // Keep track of the number of seconds required to rot all apples.
+  int seconds = 0;
+
+  // While the queue is not empty, keep rotting the fresh apples adjacent to the rotten apples.
+  while (!rottenApplesQueue.empty()) {
+    // Get the coordinates of the current rotten apple.
+    pair<int, int> currentRottenApple = rottenApplesQueue.front();
+    rottenApplesQueue.pop();
+
+    // Rot all the fresh apples adjacent to the current rotten apple.
+    for (int i = -1; i <= 1; i++) {
+      for (int j = -1; j <= 1; j++) {
+        int newX = currentRottenApple.first + i;
+        int newY = currentRottenApple.second + j;
+
+        // Check if the new coordinates are within the grid and if the cell at the new coordinates contains a fresh apple.
+        if (newX >= 0 && newX < n && newY >= 0 && newY < m && grid[newX][newY] == 1) {
+          // Rot the fresh apple.
+          grid[newX][newY] = 2;
+
+          // Add the coordinates of the new rotten apple to the queue.
+          rottenApplesQueue.push({newX, newY});
+        }
+      }
+    }
+
+    // Increment the number of seconds.
+    seconds++;
+  }
+
+  // Check if all the apples have been rotted.
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < m; j++) {
+      if (grid[i][j] == 1) {
+        return -1;
+      }
+    }
+  }
+
+  // Return the number of seconds required to rot all apples.
+  return seconds;
+}",1,0.1
+Queue_5,1455343,2213248,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+    int m = grid[0].size();
+    queue<pair<int,int>> q;
+    for(int i=0 ; i < n ; i++){
+        for(int j = 0 ; j<m;j++){
+            if(grid[i][j]==2) q.push({i,j});
+        }
+    }
+    int sec = 0 ;
+    while(!q.empty()){
+        int s = q.size();
+        //cout<<s<<endl;
+        bool check = true;
+        for(int i=0 ; i < n ; i++){
+            for(int j = 0 ; j <m ; j++){
+                if(grid[i][j]==1) check = false;
+            }
+        }
+        if(check) break;
+        for(int i = 0 ; i<s ; i++ ){
+            int x = q.front().first;
+            int y = q.front().second;
+            q.pop();
+            if(x+1<n && grid[x+1][y]==1){
+                q.push({x+1,y});
+                grid[x+1][y] = 2;
+            }
+            if(y+1<m && grid[x][y+1]==1){
+                q.push({x,y+1});
+                grid[x][y+1] = 2;
+            }
+            if(x-1>=0 && grid[x-1][y]==1){
+                q.push({x-1,y});
+                grid[x-1][y] = 2;
+            }
+            if(y-1>=0 && grid[x][y-1]==1){
+                q.push({x,y-1});
+                grid[x][y-1] = 2;
+            }
+        }
+        sec++;
+    }
+    for(int i=0 ; i<n;i++){
+        for(int j = 0 ; j< m ; j++){
+            if(grid[i][j]==1) return -1;
+        }
+    }
+    return sec;
+}",1,1.0
+Queue_5,1455368,2210532,"struct Cell {
+    int row;
+    int col;
+    int time;
+
+    Cell(int r, int c, int t) : row(r), col(c), time(t) {}
+};
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int rows = grid.size();
+    int cols = grid[0].size();
+    int freshApples = 0;
+    queue<Cell> rottenQueue;
+
+    // Initialize the queue with all rotten apples
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+            if (grid[r][c] == 2) {
+                rottenQueue.push(Cell(r, c, 0));
+            }
+            if (grid[r][c] == 1) {
+                freshApples++;
+            }
+        }
+    }
+
+    // Define possible adjacent directions
+    vector<int> dr = {-1, 1, 0, 0};
+    vector<int> dc = {0, 0, -1, 1};
+
+    while (!rottenQueue.empty()) {
+        Cell current = rottenQueue.front();
+        rottenQueue.pop();
+
+        for (int i = 0; i < 4; i++) {
+            int newRow = current.row + dr[i];
+            int newCol = current.col + dc[i];
+
+            if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
+                if (grid[newRow][newCol] == 1) {
+                    grid[newRow][newCol] = 2;
+                    rottenQueue.push(Cell(newRow, newCol, current.time + 1));
+                    freshApples--;
+                }
+            }
+        }
+    }
+
+    if (freshApples == 0) {
+        return rottenQueue.back().time;  // Return the time of the last rot
+    } else {
+        return -1;  // Some apples could not be rotten
+    }
+}",0,1.0
+Queue_5,1455438,2212499,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+ int n = grid.size();
+    int m = grid[0].size();
+    queue<pair<int, int>> q;
+    int fresh = 0;
+    
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (grid[i][j] == 2) {
+                q.push({i, j});
+            } else if (grid[i][j] == 1) {
+                fresh++;
+            }
+        }
+    }
+    
+    int time = 0;
+    vector<pair<int, int>> dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    
+    while (!q.empty() && fresh > 0) {
+        time++;
+        int size = q.size();
+        
+        for (int i = 0; i < size; i++) {
+            pair<int, int> curr = q.front();
+            q.pop();
+            
+            for (pair<int, int> dir : dirs) {
+                int x = curr.first + dir.first;
+                int y = curr.second + dir.second;
+                
+                if (x < 0 || x >= n || y < 0 || y >= m || grid[x][y] != 1) {
+                    continue;
+                }
+                
+                grid[x][y] = 2;
+                q.push({x, y});
+                fresh--;
+            }
+        }
+    }
+    
+    return fresh == 0 ? time : -1;}",0,1.0
+Queue_5,1455447,2210997,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int rows = grid.size();
+    int cols = grid[0].size();
+    vector<vector<int>> directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    queue<pair<int, int>> rottenApples;
+    int freshApples = 0;
+    
+    // Initialize the queue with rotten apples and count fresh apples
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (grid[i][j] == 2) {
+                rottenApples.push({i, j});
+            } else if (grid[i][j] == 1) {
+                freshApples++;
+            }
+        }
+    }
+    
+    int minutes = 0;
+    
+    // Perform BFS to rot fresh apples
+    while (!rottenApples.empty() && freshApples > 0) {
+        int size = rottenApples.size();
+        for (int i = 0; i < size; i++) {
+            int x = rottenApples.front().first;
+            int y = rottenApples.front().second;
+            rottenApples.pop();
+            
+            for (const vector<int>& dir : directions) {
+                int newX = x + dir[0];
+                int newY = y + dir[1];
+                
+                if (newX >= 0 && newX < rows && newY >= 0 && newY < cols && grid[newX][newY] == 1) {
+                    grid[newX][newY] = 2; // Mark the fresh apple as rotten
+                    freshApples--;
+                    rottenApples.push({newX, newY});
+                }
+            }
+        }
+        
+        minutes++;
+    }
+    
+    return (freshApples == 0) ? minutes : -1;
+}",0,1.0
+Queue_5,1455457,2212651,"#include<queue>
+const int dx[4] = {1, -1, 0, 0};
+const int dy[4] = {0, 0, 1, -1};
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    queue<pair<int,pair<int,int>>> q;
+    int cF = 0, cR = 0;
+    for (int i=0; i<(int)grid.size(); i++){
+        for (int j=0; j<(int)grid[i].size(); j++){
+            if (grid[i][j] == 2)
+                q.push({0, {i,j}});
+            else if (grid[i][j] == 1) ++cF;
+        }
+    }
+    cR = q.size();
+    if (cR == 0)    return -1;
+    int anstime = 1;
+    while (!q.empty()){
+        pair<int,pair<int,int>> f  = q.front();
+        q.pop();
+        int time = f.first;
+        for (int k = 0; k<4; k++){
+            int i1 = f.second.first+dx[k], j1 = f.second.second+dy[k];
+            if (i1 >= 0 && i1 < (int)grid.size() && j1>=0 && j1<(int)grid[0].size() && grid[i1][j1] == 1){
+                grid[i1][j1] = 2;
+                --cF;
+                q.push({time+1,{i1, j1}});
+                anstime = max(anstime, time+1);
+
+            }
+        }
+    }
+    return (cF==0?anstime:-1);
+}",0,1.0
+Queue_5,1455459,2213836,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int rows = grid.size();
+    int cols = grid[0].size();
+
+    // Define directions: up, down, left, right
+    vector<int> dx = {-1, 1, 0, 0};
+    vector<int> dy = {0, 0, -1, 1};
+
+    queue<pair<int, int>> q;
+    int freshOranges = 0;
+    int minutes = -1;
+
+    // Enqueue all initial rotten oranges
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (grid[i][j] == 2) {
+                q.push({i, j});
+            } else if (grid[i][j] == 1) {
+                freshOranges++;
+            }
+        }
+    }
+
+    // BFS to rot neighboring oranges
+    while (!q.empty()) {
+        int size = q.size();
+        for (int i = 0; i < size; i++) {
+            pair<int, int> curr = q.front();
+            q.pop();
+
+            int x = curr.first;
+            int y = curr.second;
+
+            for (int k = 0; k < 4; k++) {
+                int nx = x + dx[k];
+                int ny = y + dy[k];
+
+                if (nx >= 0 && nx < rows && ny >= 0 && ny < cols && grid[nx][ny] == 1) {
+                    grid[nx][ny] = 2; // Mark the orange as rotten
+                    q.push({nx, ny});
+                    freshOranges--;
+                }
+            }
+        }
+        minutes++;
+    }
+
+    // Return the number of minutes required for all oranges to become rotten
+    return freshOranges == 0 ? minutes : -1;
+}",0,1.0
+Queue_5,1505537,2110501,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+    int m = grid[0].size();
+    
+    vector<int> dx = {1, -1, 0, 0};
+    vector<int> dy = {0, 0, 1, -1};
+
+    queue<pair<int, int>> q;
+
+    int time = 0;
+    int freshApples = 0;
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (grid[i][j] == 1) {
+                freshApples++;
+            }
+            else if (grid[i][j] == 2) {
+                q.push({i, j});
+            }
+        }
+    }
+
+    while (!q.empty() && freshApples > 0) {
+        int size = q.size();
+        for (int i = 0; i < size; i++) {
+            int x = q.front().first;
+            int y = q.front().second;
+            q.pop();
+
+            for (int k = 0; k < 4; k++) {
+                int nx = x + dx[k];
+                int ny = y + dy[k];
+
+                if (nx >= 0 && ny >= 0 && nx < n && ny < m && grid[nx][ny] == 1) {
+                    grid[nx][ny] = 2;
+                    freshApples--;
+                    q.push({nx, ny});
+                }
+            }
+        }
+        time++;
+    }
+
+    return freshApples == 0 ? time : -1;
+}",0,1.0
+Queue_5,1508956,2252260,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    std::queue<std::pair<int, int>> q;
+    int freshApples = 0;
+    int time = -1;
+
+    for (unsigned int i = 0; i < grid.size(); ++i) {
+        for (unsigned int j = 0; j < grid[i].size(); ++j) {
+            if (grid[i][j] == 2) {
+                q.push({i, j});
+            } else if (grid[i][j] == 1) {
+                ++freshApples;
+            }
+        }
+    }
+
+    std::vector<std::vector<int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+    while (!q.empty() && freshApples) {
+        ++time;
+        int n = q.size();
+        for (int i = 0; i < n; ++i) {
+            std::pair<int, int> node = q.front();
+            q.pop();
+
+            for (auto& d : directions) {
+                int nx = node.first + d[0];
+                int ny = node.second + d[1];
+
+                if (nx >= 0 && ny >= 0 && nx < static_cast<int>(grid.size()) && ny < static_cast<int>(grid[nx].size()) && grid[nx][ny] == 1) {
+                    grid[nx][ny] = 2;
+                    --freshApples;
+                    q.push({nx, ny});
+                }
+            }
+        }
+    }
+
+    return freshApples == 0 ? time + 1 : -1;
+}",0,1.0
+Queue_5,1509649,2210200,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size(); // row size
+    int m = grid[0].size(); // column size
+ 
+    // delrow and delcol are used to traverse in
+    // up,right,bottom and left respectively.
+ 
+    int delrow[] = { -1, 0, 1, 0 };
+    int delcol[] = { 0, 1, 0, -1 };
+ 
+    // visited matrix to keep track of the visited cell.
+    int vis[n][m];
+ 
+    // queue stores rowIndex,colIndex and time taken to rot
+    // respectively.
+ 
+    queue<pair<pair<int, int>, int> > q;
+ 
+    // counter to keep track of fresh cells.
+    int cntfresh = 0;
+ 
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (grid[i][j] == 2) {
+                q.push({ { i, j },
+                         0 }); // already rotten hence 0
+                               // time to rot.
+                vis[i][j]
+                    = 2; // visited cell marked as rotten.
+            }
+            else {
+                vis[i][j] = 0; // unvisited
+            }
+            if (grid[i][j] == 1)
+                cntfresh++; // maintaining count for fresh
+                            // oranges.
+        }
+    }
+    int cnt = 0, tm = 0;
+    while (!q.empty()) {
+        int row = q.front().first.first; // row index
+        int col = q.front().first.second; // col index
+        int t = q.front().second; // time an orange at a
+                                  // cell takes to rot.
+        q.pop();
+ 
+        tm = max(tm, t);
+ 
+        // checking for adjacent nodes in 4 directions.
+        for (int i = 0; i < 4; i++) {
+            int nrow = row + delrow[i];
+            int ncol = col + delcol[i];
+ 
+            // checking the validity of a node and also
+            // vis[nrow][ncol] !=2
+            if (nrow >= 0 && nrow < n && ncol >= 0
+                && ncol < m && grid[nrow][ncol] == 1
+                && vis[nrow][ncol] != 2) {
+                vis[nrow][ncol] = 2; // adj orange is rotten
+                q.push({ { nrow, ncol },
+                         t + 1 }); // incrementing time for
+                                   // that orange by 1
+                cnt++;
+            }
+        }
+    }
+ 
+    return (cnt == cntfresh) ? tm : -1;
+}",0,1.0
+Queue_5,1511195,2211821,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int r = grid.size();
+    int c = grid[0].size(); 
+    vector<vector<int>> t(r, vector<int>(c)); 
+    int time = 0; 
+    int dx[] = {0,0,1,-1};
+    int dy[] = {1,-1,0,0};
+    
+    queue<pair<int,int>> q; 
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) {
+            if (grid[i][j] == 2) {
+                q.push({i,j}); 
+                t[i][j] = 0; 
+                //grid[i][j] = '0'; 
+            }
+        }
+    }
+    
+    while (!q.empty()) {
+        pair<int,int> x = q.front(); 
+        q.pop(); 
+        for (int k = 0; k < 4; k++) {
+            int X = x.first + dx[k]; 
+            int Y = x.second + dy[k]; 
+            if (X >= 0 && X < r && Y >= 0 && Y < c && grid[X][Y] == 1) {
+                t[X][Y] = t[x.first][x.second] + 1; 
+                grid[X][Y] = 0; 
+                q.push({X,Y}); 
+                time = max(time, t[X][Y]); 
+            }
+        }
+    }
+    
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) {
+            if (grid[i][j] == 1) return -1; 
+        }
+    }
+    
+    return time; 
+}",0,1.0
+Queue_5,1515899,2210535,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+    if (n == 0) {
+        return -1;
+    }
+    int m= grid[0].size();
+    queue<pair<int,int>> q;
+    int sizeofq = 0;
+    int sec = -1;
+    for (int i=0; i<n; i++) {
+        for (int j=0; j<m; j++) {
+            if (grid[i][j] == 2)    {
+                q.push(make_pair(i,j));
+                sizeofq++;
+            }
+        }
+    }
+    int sizeofq1 = 0;
+    while (!q.empty())  {
+        sec++;
+        for (int i=0; i < sizeofq; i++) {
+            pair<int,int> temp = q.front();
+            q.pop();
+            if (temp.first != 0)    {
+                if (grid[temp.first-1][temp.second] == 1)   {
+                    grid[temp.first-1][temp.second] = 2;
+                    q.push(make_pair(temp.first-1,temp.second));
+                    sizeofq1++;
+                }
+            }
+            if (temp.second != 0)    {
+                if (grid[temp.first][temp.second-1] == 1)   {
+                    grid[temp.first][temp.second-1] = 2;
+                    q.push(make_pair(temp.first,temp.second-1));
+                    sizeofq1++;
+                }
+            }
+            if (temp.first != n-1)    {
+                if (grid[temp.first+1][temp.second] == 1)   {
+                    grid[temp.first+1][temp.second] = 2;
+                    q.push(make_pair(temp.first+1,temp.second));
+                    sizeofq1++;
+                }
+            }
+            if (temp.second != m-1)    {
+                if (grid[temp.first][temp.second+1] == 1)   {
+                    grid[temp.first][temp.second+1] = 2;
+                    q.push(make_pair(temp.first,temp.second+1));
+                    sizeofq1++;
+                }
+            }
+        }
+        sizeofq = sizeofq1;
+        sizeofq1 = 0;
+    }
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            if (grid[i][j] == 1) return -1;
+        }
+    }
+    return sec;
+}",1,1.0
+Queue_5,1521765,2211738,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+const vector<int> dx = {1, -1, 0, 0};
+const vector<int> dy = {0, 0, 1, -1};
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+    int m = grid[0].size();
+    int freshApples = 0;
+queue<pair<int, int>> rottenApples;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (grid[i][j] == 2) {
+                rottenApples.push({i, j});
+            } else if (grid[i][j] == 1) {
+                freshApples++;
+            }
+        }
+    }
+
+    int minutes = 0;
+
+    while (!rottenApples.empty() && freshApples > 0) {
+        int size = rottenApples.size();
+
+        for (int i = 0; i < size; i++) {
+            int x = rottenApples.front().first;
+            int y = rottenApples.front().second;
+            rottenApples.pop();
+
+            for (int k = 0; k < 4; k++) {
+                int newX = x + dx[k];
+                int newY = y + dy[k];
+
+                if (newX >= 0 && newX < n && newY >= 0 && newY < m && grid[newX][newY] == 1) {
+                    grid[newX][newY] = 2;
+                    rottenApples.push({newX, newY});
+                    freshApples--;
+                }
+            }
+        }
+
+        if (!rottenApples.empty()) {
+            minutes++;
+        }
+    }
+    return (freshApples == 0) ? minutes : -1;
+}",0,1.0
+Queue_5,1524445,2212741,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+        int rows = grid.size();
+    int cols = grid[0].size();
+
+    queue<pair<int, int>> rottenApples;
+    int freshApples = 0;
+    int time = 0;
+
+    // Count the number of fresh apples and enqueue the initial rotten apples
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (grid[i][j] == 1)
+                freshApples++;
+            else if (grid[i][j] == 2)
+                rottenApples.push({i, j});
+        }
+    }
+
+    // If there are no fresh apples, return 0
+    if (freshApples == 0)
+        return 0;
+
+    // Perform BFS to rot apples and count the time
+    vector<pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+    while (!rottenApples.empty()) {
+        int size = rottenApples.size();
+
+        for (int i = 0; i < size; i++) {
+            int x = rottenApples.front().first;
+            int y = rottenApples.front().second;
+            rottenApples.pop();
+
+            for (const auto& direction : directions) {
+                int newX = x + direction.first;
+                int newY = y + direction.second;
+
+                if (newX >= 0 && newX < rows && newY >= 0 && newY < cols && grid[newX][newY] == 1) {
+                    grid[newX][newY] = 2;
+                    rottenApples.push({newX, newY});
+                    freshApples--;
+
+                    if (freshApples == 0)
+                        return time + 1;
+                }
+            }
+        }
+
+        time++;
+    }
+
+    // If there are still fresh apples left, return -1
+    return -1;
+
+}",0,1.0
+Queue_5,1525121,2211367,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+    int m = grid[0].size();
+    int freshApples = 0; // Count of fresh apples
+    int rotTime = 0; // Time to rot all apples
+
+    std::queue<std::pair<int, int>> rottenApples;
+
+    // Initialize the queue with rotten apples and count fresh apples
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (grid[i][j] == 2) {
+                rottenApples.push({i, j});
+            } else if (grid[i][j] == 1) {
+                freshApples++;
+            }
+        }
+    }
+
+    // Define directions to explore (up, down, left, right)
+    int dx[] = {-1, 1, 0, 0};
+    int dy[] = {0, 0, -1, 1};
+
+    while (!rottenApples.empty() && freshApples > 0) {
+        int numRottenThisRound = rottenApples.size();
+
+        for (int i = 0; i < numRottenThisRound; i++) {
+            int x = rottenApples.front().first;
+            int y = rottenApples.front().second;
+            rottenApples.pop();
+
+            for (int d = 0; d < 4; d++) {
+                int newX = x + dx[d];
+                int newY = y + dy[d];
+
+                if (newX >= 0 && newX < n && newY >= 0 && newY < m && grid[newX][newY] == 1) {
+                    grid[newX][newY] = 2; // Fresh apple becomes rotten
+                    rottenApples.push({newX, newY});
+                    freshApples--;
+                }
+            }
+        }
+
+        rotTime++;
+    }
+
+    return (freshApples == 0) ? rotTime : -1;
+}",0,1.0
+Queue_5,1526588, ,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+    int m = grid[0].size();
+    queue<pair<int, int>> rottenApples;
+    
+    // Find and enqueue all initial rotten apples
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            if (grid[i][j] == 2) {
+                rottenApples.push({i, j});
+            }
+        }
+    }
+    
+    int seconds = 0;
+    int freshApples = 0; // Count of fresh apples
+    
+    // Define directions to explore neighbors
+    vector<int> dx = {-1, 1, 0, 0};
+    vector<int> dy = {0, 0, -1, 1};
+    
+    while (!rottenApples.empty()) {
+        int size = rottenApples.size();
+        
+        for (int i = 0; i < size; ++i) {
+            pair<int, int> curr = rottenApples.front();
+            rottenApples.pop();
+            
+            for (int k = 0; k < 4; ++k) {
+                int x = curr.first + dx[k];
+                int y = curr.second + dy[k];
+                
+                if (x >= 0 && x < n && y >= 0 && y < m && grid[x][y] == 1) {
+                    grid[x][y] = 2; // Mark the fresh apple as rotten
+                    rottenApples.push({x, y});
+                    freshApples--;
+                }
+            }
+        }
+        
+        if (!rottenApples.empty()) {
+            seconds++;
+        }
+    }
+    
+    // Check if there are any remaining fresh apples
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            if (grid[i][j] == 1) {
+                return -1; // There are unreachable fresh apples
+            }
+        }
+    }
+    
+    return seconds;
+}",0,1.0
+Queue_5,1528749,2013048,"int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+    int m = grid[0].size();
+    int freshApples = 0;
+    queue<pair<int, int>> rotten;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (grid[i][j] == 2) {
+                rotten.push({i, j});
+            } else if (grid[i][j] == 1) {
+                freshApples++;
+            }
+        }
+    }
+    if (freshApples == 0) {
+        return 0;
+    }
+    vector<pair<int, int>> directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+    int sec = 0;
+    while (!rotten.empty()) {
+        int currentSize = rotten.size();
+        for (int i = 0; i < currentSize; i++) {
+            int x = rotten.front().first;
+            int y = rotten.front().second;
+            rotten.pop();
+            for (auto dir : directions) {
+                int newX = x + dir.first;
+                int newY = y + dir.second;
+                if (newX >= 0 && newX < n && newY >= 0 && newY < m && grid[newX][newY] == 1) {
+                    grid[newX][newY] = 2; // Mark the fresh apple as rotten
+                    rotten.push({newX, newY});
+                    freshApples--;
+                }
+            }
+        }
+        if (!rotten.empty()) {
+            sec++;
+        }
+    }
+    return (freshApples == 0) ? sec : -1;
+}",0,1.0
+Queue_5,1528828,1912532,"struct Cell {
+    int x, y, time;
+    Cell(int x, int y, int time) : x(x), y(y), time(time) {}
+};
+
+int secondsToBeRotten(std::vector<std::vector<int>>& grid) {
+    const int rows = grid.size();
+    const int cols = grid[0].size();
+    const std::vector<std::pair<int, int>> directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    
+    std::queue<Cell> rottenApples;
+    int freshApplesCount = 0;
+
+    // Initialize the rotten apples and count the fresh apples
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            if (grid[i][j] == 2) {
+                rottenApples.push(Cell(i, j, 0));
+            }
+            if (grid[i][j] == 1) {
+                freshApplesCount++;
+            }
+        }
+    }
+
+    int minTime = 0;
+    
+    while (!rottenApples.empty()) {
+        Cell current = rottenApples.front();
+        rottenApples.pop();
+
+        for (const auto& dir : directions) {
+            int newX = current.x + dir.first;
+            int newY = current.y + dir.second;
+
+            if (newX >= 0 && newX < rows && newY >= 0 && newY < cols && grid[newX][newY] == 1) {
+                grid[newX][newY] = 2; // Mark the fresh apple as rotten
+                rottenApples.push(Cell(newX, newY, current.time + 1));
+                freshApplesCount--;
+
+                if (current.time + 1 > minTime) {
+                    minTime = current.time + 1;
+                }
+            }
+        }
+    }
+
+    return (freshApplesCount == 0) ? minTime : -1;
+}",0,1.0
+Queue_5,1531170,2210535,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+    if (n == 0) {
+        return -1;
+    }
+    int m= grid[0].size();
+    queue<pair<int,int>> q;
+    int sizeofq = 0;
+    int sec = -1;
+    for (int i=0; i<n; i++) {
+        for (int j=0; j<m; j++) {
+            if (grid[i][j] == 2)    {
+                q.push(make_pair(i,j));
+                sizeofq++;
+            }
+        }
+    }
+    int sizeofq1 = 0;
+    while (!q.empty())  {
+        sec++;
+        for (int i=0; i < sizeofq; i++) {
+            pair<int,int> temp = q.front();
+            q.pop();
+            if (temp.first != 0)    {
+                if (grid[temp.first-1][temp.second] == 1)   {
+                    grid[temp.first-1][temp.second] = 2;
+                    q.push(make_pair(temp.first-1,temp.second));
+                    sizeofq1++;
+                }
+            }
+            if (temp.second != 0)    {
+                if (grid[temp.first][temp.second-1] == 1)   {
+                    grid[temp.first][temp.second-1] = 2;
+                    q.push(make_pair(temp.first,temp.second-1));
+                    sizeofq1++;
+                }
+            }
+            if (temp.first != n-1)    {
+                if (grid[temp.first+1][temp.second] == 1)   {
+                    grid[temp.first+1][temp.second] = 2;
+                    q.push(make_pair(temp.first+1,temp.second));
+                    sizeofq1++;
+                }
+            }
+            if (temp.second != m-1)    {
+                if (grid[temp.first][temp.second+1] == 1)   {
+                    grid[temp.first][temp.second+1] = 2;
+                    q.push(make_pair(temp.first,temp.second+1));
+                    sizeofq1++;
+                }
+            }
+        }
+        sizeofq = sizeofq1;
+        sizeofq1 = 0;
+    }
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            if (grid[i][j] == 1) return -1;
+        }
+    }
+    return sec;
+}",1,1.0
+Queue_5,1531636,2210055,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+  int m = grid[0].size();
+
+  // Create a queue to store the coordinates of the rotten apples.
+  queue<pair<int, int>> rottenApplesQueue;
+
+  // Initialize the queue with the coordinates of all the rotten apples.
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < m; j++) {
+      if (grid[i][j] == 2) {
+        rottenApplesQueue.push({i, j});
+      }
+    }
+  }
+
+  // Keep track of the number of seconds required to rot all apples.
+  int seconds = 0;
+
+  // While the queue is not empty, keep rotting the fresh apples adjacent to the rotten apples.
+  while (!rottenApplesQueue.empty()) {
+    // Get the coordinates of the current rotten apple.
+    pair<int, int> currentRottenApple = rottenApplesQueue.front();
+    rottenApplesQueue.pop();
+
+    // Rot all the fresh apples adjacent to the current rotten apple.
+    for (int i = -1; i <= 1; i++) {
+      for (int j = -1; j <= 1; j++) {
+        int newX = currentRottenApple.first + i;
+        int newY = currentRottenApple.second + j;
+
+        // Check if the new coordinates are within the grid and if the cell at the new coordinates contains a fresh apple.
+        if (newX >= 0 && newX < n && newY >= 0 && newY < m && grid[newX][newY] == 1) {
+          // Rot the fresh apple.
+          grid[newX][newY] = 2;
+
+          // Add the coordinates of the new rotten apple to the queue.
+          rottenApplesQueue.push({newX, newY});
+        }
+      }
+    }
+
+    // Increment the number of seconds.
+    seconds++;
+  }
+
+  // Check if all the apples have been rotted.
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < m; j++) {
+      if (grid[i][j] == 1) {
+        return -1;
+      }
+    }
+  }
+
+  // Return the number of seconds required to rot all apples.
+  return seconds;
+}",1,0.1
+Queue_5,1531963,2212282,"int secondsToBeRotten(vector<vector<int>>& grid) {
+    int rows = grid.size();
+    int cols = grid[0].size();
+    vector<pair<int, int>> directions{{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    queue<pair<int, int>> rottenQueue;
+    int freshCount = 0;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (grid[i][j] == 2) {
+                rottenQueue.push({i, j});
+            } else if (grid[i][j] == 1) {
+                freshCount++;
+            }
+        }
+    }
+     if (freshCount == 0) {
+        return 0;
+    }
+     int seconds = 0;
+    while (!rottenQueue.empty()) {
+        int size = rottenQueue.size();
+        bool rottenOccurred = false;
+    for (int i = 0; i < size; i++) {
+            int x = rottenQueue.front().first;
+            int y = rottenQueue.front().second;
+            rottenQueue.pop();
+    for (const auto& dir : directions) {
+                int newX = x + dir.first;
+                int newY = y + dir.second;
+    if (newX >= 0 && newX < rows && newY >= 0 && newY < cols && grid[newX][newY] == 1) {
+                  
+                    grid[newX][newY] = 2;
+                    rottenQueue.push({newX, newY});
+                    rottenOccurred = true;
+                    freshCount--;
+                }
+            }
+        }
+
+        if (rottenOccurred) {
+            seconds++;
+        }
+    }
+
+    
+    if (freshCount > 0) {
+        return -1;
+    }
+
+    return seconds;
+}",0,1.0
+Queue_5,1532256,2210200,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size(); // row size
+    int m = grid[0].size(); // column size
+ 
+    int delrow[] = { -1, 0, 1, 0 };
+    int delcol[] = { 0, 1, 0, -1 };
+ 
+
+    int vis[n][m];
+
+    queue<pair<pair<int, int>, int> > q;
+    int cntfresh = 0;
+ 
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (grid[i][j] == 2) {
+                q.push({{i,j},0});
+                vis[i][j] = 2; 
+            }
+            else {
+                vis[i][j] = 0; 
+            }
+            if (grid[i][j] == 1)
+                cntfresh++; 
+        }
+    }
+    int cnt = 0, tm = 0;
+    while (!q.empty()) {
+        int row = q.front().first.first; 
+        int col = q.front().first.second; 
+        int t = q.front().second; 
+        q.pop();
+        tm = max(tm, t);
+        for (int i = 0; i < 4; i++) {
+            int nrow = row + delrow[i];
+            int ncol = col + delcol[i];
+            if (nrow >= 0 && nrow < n && ncol >= 0
+                && ncol < m && grid[nrow][ncol] == 1
+                && vis[nrow][ncol] != 2) {
+                vis[nrow][ncol] = 2; 
+                q.push({ { nrow, ncol }, t + 1 }); 
+                cnt++;
+            }
+        }
+    }
+    return ((cnt == cntfresh) ? tm : -1);
+}",0,1.0
+Queue_5,1532384,2211738,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+const vector<int> dx = {1, -1, 0, 0};
+const vector<int> dy = {0, 0, 1, -1};
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+    int m = grid[0].size();
+    int freshApples = 0;
+queue<pair<int, int>> rottenApples;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (grid[i][j] == 2) {
+                rottenApples.push({i, j});
+            } else if (grid[i][j] == 1) {
+                freshApples++;
+            }
+        }
+    }
+
+    int minutes = 0;
+
+    while (!rottenApples.empty() && freshApples > 0) {
+        int size = rottenApples.size();
+
+        for (int i = 0; i < size; i++) {
+            int x = rottenApples.front().first;
+            int y = rottenApples.front().second;
+            rottenApples.pop();
+
+            for (int k = 0; k < 4; k++) {
+                int newX = x + dx[k];
+                int newY = y + dy[k];
+
+                if (newX >= 0 && newX < n && newY >= 0 && newY < m && grid[newX][newY] == 1) {
+                    grid[newX][newY] = 2;
+                    rottenApples.push({newX, newY});
+                    freshApples--;
+                }
+            }
+        }
+
+        if (!rottenApples.empty()) {
+            minutes++;
+        }
+    }
+    return (freshApples == 0) ? minutes : -1;
+}",0,1.0
+Queue_5,1536077,2213248,"// iostream, vector and queue are included
+// Hint: use breadth-first-search
+
+int secondsToBeRotten(vector<vector<int>>& grid) {
+    int n = grid.size();
+    int m = grid[0].size();
+    queue<pair<int,int>> q;
+    for(int i=0 ; i < n ; i++){
+        for(int j = 0 ; j<m;j++){
+            if(grid[i][j]==2) q.push({i,j});
+        }
+    }
+    int sec = 0 ;
+    while(!q.empty()){
+        int s = q.size();
+        //cout<<s<<endl;
+        bool check = true;
+        for(int i=0 ; i < n ; i++){
+            for(int j = 0 ; j <m ; j++){
+                if(grid[i][j]==1) check = false;
+            }
+        }
+        if(check) break;
+        for(int i = 0 ; i<s ; i++ ){
+            int x = q.front().first;
+            int y = q.front().second;
+            q.pop();
+            if(x+1<n && grid[x+1][y]==1){
+                q.push({x+1,y});
+                grid[x+1][y] = 2;
+            }
+            if(y+1<m && grid[x][y+1]==1){
+                q.push({x,y+1});
+                grid[x][y+1] = 2;
+            }
+            if(x-1>=0 && grid[x-1][y]==1){
+                q.push({x-1,y});
+                grid[x-1][y] = 2;
+            }
+            if(y-1>=0 && grid[x][y-1]==1){
+                q.push({x,y-1});
+                grid[x][y-1] = 2;
+            }
+        }
+        sec++;
+    }
+    for(int i=0 ; i<n;i++){
+        for(int j = 0 ; j< m ; j++){
+            if(grid[i][j]==1) return -1;
+        }
+    }
+    return sec;
+}",1,1.0
