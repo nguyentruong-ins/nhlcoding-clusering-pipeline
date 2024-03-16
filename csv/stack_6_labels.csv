@@ -1,0 +1,758 @@
+problem_slug,submission_id,student_code,code,labels,score
+Stack_6,1454531,2210997,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    int n = arr.size();
+    vector <int> ans;
+    for (int i = 0; i < n-1 ; i++)
+    {
+        for (int j = i; j < n;j++)
+        {
+            if (arr[i] < arr[j])
+            {
+                ans.push_back(arr[j]);
+                break;
+            }
+            else if (j == n-1 && arr[i] > arr[j]) 
+            {
+                ans.push_back(-1);
+            }
+        }
+    }
+     ans.push_back(-1);
+    return ans;
+    
+}",0,1.0
+Stack_6,1454547,2212303,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    int n = arr.size();
+    vector<int> result(n, -1);  // Initialize the result array with -1.
+
+    stack<int> st;  // Create a stack to store indices of elements.
+
+    for (int i = 0; i < n; i++) {
+        while (!st.empty() && arr[i] > arr[st.top()]) {
+            // If the current element is greater than the element at the top of the stack, update the result.
+            result[st.top()] = arr[i];
+            st.pop();  // Pop the index from the stack.
+        }
+        st.push(i);  // Push the current index onto the stack.
+    }
+
+    return result;
+}",1,1.0
+Stack_6,1454553,2211876,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& nums){
+    int n = nums.size();
+    vector<int> result(n, -1); // Initialize the result vector with -1.
+
+    stack<int> s; // Create a stack to store indices of elements.
+
+    for (int i = 0; i < n; i++) {
+        while (!s.empty() && nums[i] > nums[s.top()]) {
+            // If the current element is greater than the element at the top of the stack,
+            // update the result for the element at the top of the stack.
+            result[s.top()] = nums[i];
+            s.pop(); // Pop the element from the stack.
+        }
+        s.push(i); // Push the current element's index onto the stack.
+    }
+
+    return result;
+}",1,1.0
+Stack_6,1454572,2210200,"vector<int> nextGreater(vector<int>& arr){
+    stack<int> st;
+    int n = arr.size();
+    vector<int> ans(n);
+    for(int i = n - 1; i >= 0; i--){
+        while(!st.empty() && arr[st.top()] <= arr[i]) st.pop();
+        ans[i] = -1;
+        if(!st.empty()) ans[i] = arr[st.top()];
+        st.push(i);
+    }
+    return ans;
+}",1,1.0
+Stack_6,1454582,2211170,"// iostream, stack and vector are included
+
+vector<int> nextGreater(std::vector<int>& arr) {
+    int n = arr.size();
+    std::vector<int> result(n, -1); // Initialize the result vector with -1
+    
+    std::stack<int> st;
+    
+    for (int i = 0; i < n; i++) {
+        while (!st.empty() && arr[st.top()] < arr[i]) {
+            result[st.top()] = arr[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+    
+    return result;
+}",1,1.0
+Stack_6,1454583,2013048,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    for(int i = 0; i < (int) arr.size() - 1; i++){
+        int j = i + 1;
+        while(j < (int) arr.size() && arr[j] < arr[i]){
+            j++;
+        }
+        if(j == (int) arr.size()){
+            arr[i] = -1;
+        }else{
+            arr[i] = arr[j];
+        }
+    }
+    arr[arr.size() - 1] = -1;
+    return arr;
+}",0,1.0
+Stack_6,1454585,2210103,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr) {
+    bool isNextGreater = false;
+    for (int i = 0; i < (int)arr.size(); i++)
+    {
+        for (int j = i; j < (int)arr.size(); j++)
+        {
+            if (arr.at(j) > arr.at(i))
+            {
+                arr[i] = arr[j];
+                isNextGreater = true;
+                break;
+            }
+        }
+
+        if (!isNextGreater)
+        {
+            arr[i] = -1;
+        }
+        isNextGreater = false;
+    }
+    return arr;
+}",0,1.0
+Stack_6,1454587,2210535,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    int n=arr.size();
+    vector<int> result(n, -1);
+    stack<int> st;
+    for (int i=0; i<n; i++) {
+        while (!st.empty() && arr[i] > arr[st.top()])   {
+            result[st.top()] = arr[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+    return result;
+}",1,1.0
+Stack_6,1454594,2210578,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    int n = arr.size();
+    vector<int> result(n, -1);
+    stack<int> st;
+
+    for (int i = 0; i < n; ++i) {
+        while (!st.empty() && arr[st.top()] < arr[i]) {
+            result[st.top()] = arr[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+
+    return result;
+}",1,1.0
+Stack_6,1454631,2210458,"vector<int> nextGreater(vector<int>& arr){
+    stack<int> stk;
+    int size = arr.size();
+    for (int i = size -1 ; i >= 0; --i) stk.push(arr[i]);
+    for (int i = 0; i < size- 1; ++i)
+    {
+        for (int j = i+1; j < size; ++j)
+        {
+            if (arr[j] > stk.top() ) 
+            {
+                arr[i] = arr[j]; 
+                break;
+            }
+            else
+            {
+                if (j == size -1 ) arr[i] = -1;
+            }
+        }
+        stk.pop();
+    }
+    arr[arr.size()-1] = -1;
+    return arr;
+}",3,1.0
+Stack_6,1454649,2210034,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& nums) {
+    int n = nums.size();
+    vector<int> res(n, -1);
+    stack<int> st;
+
+    for (int i = 0; i < n; ++i) {
+        while (!st.empty() && nums[st.top()] < nums[i]) {
+            res[st.top()] = nums[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+
+    return res;
+}",1,1.0
+Stack_6,1454650,2213035,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    stack<int> st;
+    int n = arr.size();
+    vector<int> res(n);
+    for(int i = 0; i< n; i++){
+        if(st.empty() || arr[i] <= arr[st.top()]){
+            st.push(i);
+        }else{
+            while(!st.empty() && arr[i] > arr[st.top()]){
+                res[st.top()] = arr[i];
+                st.pop();
+            }
+            st.push(i);
+        }
+    }
+    while(!st.empty()){
+        res[st.top()] = -1;
+        st.pop();
+    }
+    return res;
+}",1,1.0
+Stack_6,1454652,2212372,"vector<int> nextGreater(vector<int>& arr) {
+    stack<int> st;
+    vector<int> ans(arr.size(), -1);
+
+    for (unsigned int i=0; i<arr.size(); i++) {
+        while (!st.empty() && arr[st.top()] <= arr[i]) {
+            ans[st.top()] = arr[i];
+            st.pop();
+        }
+
+        st.push(i);
+    }
+
+    while (!st.empty()) {
+        ans[st.top()] = -1;
+        st.pop();
+    }
+
+    return ans;
+}",1,1.0
+Stack_6,1454655,2211821,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    vector<int> ans(arr.size(), -1);
+    for (int i = 0; i < arr.size(); i++) {
+        for (int j = i + 1; j < arr.size(); j++) {
+            if (arr[j] > arr[i]) {
+                ans[i] = arr[j]; 
+                break; 
+            }
+        }
+    }
+    return ans; 
+}",0,1.0
+Stack_6,1454659,2212282,"vector<int> nextGreater(vector<int>& nums) {
+    int n = nums.size();
+    vector<int> result(n, -1); // Initialize the result array with -1
+    
+    stack<int> st; // Use a stack to keep track of indices
+    
+    for (int i = 0; i < n; i++) {
+        // For each element, keep popping elements from the stack until the current element is greater than the top of the stack
+        while (!st.empty() && nums[i] > nums[st.top()]) {
+            int index = st.top();
+            st.pop();
+            result[index] = nums[i];
+        }
+        st.push(i); // Push the current element's index to the stack
+    }
+    
+    return result;
+}",1,1.0
+Stack_6,1454661,2213248,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    stack<int> st;
+    int n = arr.size();
+    vector<int> res(n,0);
+    res[n-1] = -1;
+    st.push(arr[n-1]);
+    for(int i = n -2 ; i>=0 ;i--){
+        if(arr[i]<st.top()){
+            res[i] = st.top();
+            st.push(arr[i]);
+        }
+        else{
+            while(!st.empty()&&st.top()<=arr[i]){
+                st.pop();
+            }
+            if(st.empty()){
+                res[i] = -1;
+            }
+            else {
+                res[i] = st.top();
+            }
+            st.push(arr[i]);
+        }
+    }
+    return res;
+    
+}",2,1.0
+Stack_6,1454662,2210055,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+     stack<int> s;
+  vector<int> result(arr.size(), -1);
+
+  for (int i = arr.size() - 1; i >= 0; i--) {
+    while (!s.empty() && arr[s.top()] <= arr[i]) {
+      s.pop();
+    }
+
+    if (!s.empty()) {
+      result[i] = arr[s.top()];
+    }
+
+    s.push(i);
+  }
+
+  return result;
+}",1,1.0
+Stack_6,1454665,2211878,"vector<int> nextGreater(vector<int>& arr) {
+    int n = arr.size();
+    vector<int> result(n, -1);
+    stack<int> s;
+    for (int i = 0; i < n; i++) {
+        while (!s.empty() && arr[s.top()] < arr[i]) {
+            result[s.top()] = arr[i];
+            s.pop();
+        }
+        s.push(i);
+    }
+    return result;
+}",1,1.0
+Stack_6,1454669,2213250,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    stack<int> st;
+    int n = arr.size();
+    vector<int> res(n,0);
+    res[n-1] = -1;
+    st.push(arr[n-1]);
+    for(int i = n -2 ; i>=0 ;i--){
+        if(arr[i]<st.top()){
+            res[i] = st.top();
+            st.push(arr[i]);
+        }
+        else{
+            while(!st.empty()&&st.top()<=arr[i]){
+                st.pop();
+            }
+            if(st.empty()){
+                res[i] = -1;
+            }
+            else {
+                res[i] = st.top();
+            }
+            st.push(arr[i]);
+        }
+    }
+    return res;
+    
+}",2,1.0
+Stack_6,1454675,2211667,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& nums){
+    
+    int n = nums.size();
+    vector<int> result(n, -1);
+    stack<int> s;
+
+    for (int i = 0; i < n; i++) {
+        while (!s.empty() && nums[i] > nums[s.top()]) {
+            result[s.top()] = nums[i];
+            s.pop();
+        }
+        s.push(i);
+    }
+
+    return result;
+
+}",1,1.0
+Stack_6,1454685,2110501,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    vector<int> ans;
+    int n = arr.size();
+    if (n == 0) return ans;
+    
+    stack<int> stk;
+    stk.push(n - 1);
+    ans.push_back(-1);
+    
+    for (int i = n - 2; i >= 0; i--)
+    {
+        while (!stk.empty() && arr[stk.top()] <= arr[i]) 
+            stk.pop();
+        ans.insert(ans.begin(), (stk.empty()) ? (-1) : (arr[stk.top()]));
+        stk.push(i);
+    }
+    return ans;
+}",2,1.0
+Stack_6,1454703,2112585,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    int n = arr.size();
+    vector<int> result(n, -1);
+    stack<int> st;
+
+    for (int i = 0; i < n; i++) {
+        while (!st.empty() && arr[i] > arr[st.top()]) {
+            result[st.top()] = arr[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+
+    return result;
+}",1,1.0
+Stack_6,1454710,2212935,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    int n = arr.size();
+    vector<int> result(n, -1); 
+    stack<int> st;
+
+    for (int i = n - 1; i >= 0; i--) {
+        while (!st.empty() && arr[i] >= st.top()) {
+            st.pop();
+        }
+        if (!st.empty()) {
+            result[i] = st.top();
+        }
+        st.push(arr[i]);
+    }
+
+    return result;
+}",2,1.0
+Stack_6,1454732,2212651,"vector<int> nextGreater(vector<int>& arr){
+        vector<int> ans((int)arr.size());
+        stack<int> st;
+        for (int i=0; i<(int)arr.size(); i++){
+            while (!st.empty() && arr[i] > arr[st.top()]){
+                ans[st.top()] = arr[i];
+                st.pop();
+            }
+            st.push(i);
+        }
+        while (!st.empty()){
+            ans[st.top()] = -1;
+            st.pop();
+        }
+        return ans;
+    }",1,1.0
+Stack_6,1454736,2213298,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    vector<int> v;
+    for (int i = 1; i < arr.size(); i++) {
+        if (arr[i] < arr[i - 1]) v.push_back(-1);
+        else v.push_back(arr[i]);
+    }
+    v.push_back(-1);
+    return v;
+}",0,0.2
+Stack_6,1454803,2210532,"vector<int> nextGreater(vector<int> nums){
+    stack<int> s;
+    vector<int> result(nums.size(),-1);
+    for(int i=0;i<nums.size();i++){
+        while(!s.empty() && nums[s.top()]< nums[i]){
+            result[s.top()]=nums[i];
+            s.pop();
+        }
+        s.push(i);
+    }
+	return result;
+}",1,1.0
+Stack_6,1454923,2211367,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+     int n = arr.size();
+    vector<int> res(n, - 1);
+    stack<int> s, pos;
+    s.push(arr[0]);
+    pos.push(0);
+    for (int i = 1; i < n; i++){
+        while (!s.empty() && arr[i] > s.top()){
+            res[pos.top()] = arr[i];
+            pos.pop(); s.pop();
+        }
+        s.push(arr[i]); pos.push(i);
+    }
+    return res;
+}",1,1.0
+Stack_6,1455019,2212499,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    int n = arr.size();
+    vector<int> res(n, -1);
+    stack<int> s;
+    
+    for (int i = 0; i < n; i++) {
+        while (!s.empty() && arr[s.top()] < arr[i]) {
+            res[s.top()] = arr[i];
+            s.pop();
+        }
+        s.push(i);
+    }
+    
+    return res;
+}",1,1.0
+Stack_6,1455121,2213836,"// iostream, stack and vector are included
+
+int indexOf(vector<int> arr, int e) {
+    for(unsigned int i = 0; i < arr.size(); i++) {
+        if(arr[i] == e) return i;
+    }
+    return -1;
+}
+
+vector<int> nextGreater(vector<int>& arr){
+    int n = arr.size();
+    vector<int> res(n, -1);
+    stack<int> st;
+    for(int i = 0; i < n; i++) {
+        while(!st.empty() && arr[i] > arr[st.top()]) {
+            res[st.top()] = arr[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+    return res;
+}",1,1.0
+Stack_6,1501583,2252260,"// iostream, stack and vector are included
+int indexOf(vector<int> arr, int e){
+    for(unsigned int i=0; i<arr.size(); i++){
+        if(arr[i] == e)
+            return i;
+    }
+    return -1;
+}
+
+vector<int> nextGreater(vector<int>& arr){
+    int n = arr.size();
+    vector<int> res(n,-1);
+    stack<int> st;
+    for(int i=0; i<n; i++){
+        while(!st.empty() && arr[i] > arr[st.top()]){
+            res[st.top()] = arr[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+    
+    return res;
+}",1,1.0
+Stack_6,1520666,2212741,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+        stack<int> st;
+    vector<int> result(arr.size(),-1);
+    for (int i=0;i<arr.size();i++){
+        while (!st.empty() && arr[i]>arr[st.top()]){
+            result[st.top()]=arr[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+    return result;
+
+}",1,1.0
+Stack_6,1521743,2211738,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    stack<int> stk;
+    for(int i = 0; i < arr.size(); i++){
+        stk.push(arr[i]);
+        for(int j = i+1; j < arr.size(); j++){
+            if(arr[j] > stk.top()){
+                arr[i] = arr[j];
+                break;
+            }
+        }
+        if(arr[i] != stk.top()){
+            stk.pop();
+        }else{
+            arr[i] = -1;
+        }
+    }
+    return arr;
+}",4,1.0
+Stack_6,1525055,2212935,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    stack <int> st;
+    int n = arr.size();
+    vector<int>result(n, -1);
+    for (int i = n-1; i >= 0; i--){
+        while (!st.empty() && arr[i] > st.top()){
+            st.pop();
+        }
+        if (!st.empty()){
+            result[i] = st.top();
+        }
+        st.push(arr[i]);
+    }
+    return result;
+}",2,1.0
+Stack_6,1528061,1912532,"std::vector<int> nextGreater(std::vector<int>& arr) {
+    int n = arr.size();
+    std::vector<int> result(n, -1); // Initialize the result array with -1.
+    std::stack<int> st; // Create a stack to store indices.
+
+    for (int i = 0; i < n; i++) {
+        while (!st.empty() && arr[i] > arr[st.top()]) {
+            // If the current element is greater than the element at the top of the stack,
+            // update the result for the element at the top of the stack and pop it.
+            result[st.top()] = arr[i];
+            st.pop();
+        }
+        st.push(i); // Push the current element's index onto the stack.
+    }
+
+    return result;
+}",1,1.0
+Stack_6,1531430,2211876,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& nums){
+    int n = nums.size();
+    vector<int> result(n, -1); 
+    stack<int> st; 
+
+    for (int i = 0; i < n; i++) {
+        while (!st.empty() && nums[i] > nums[st.top()]) {
+            
+            result[st.top()] = nums[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+
+    return result;    
+}",1,1.0
+Stack_6,1531631,2210055,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+     int n = arr.size();
+    vector<int> result(n, -1);  
+
+    stack<int> st;  
+
+    for (int i = 0; i < n; i++) {
+        while (!st.empty() && arr[i] > arr[st.top()]) {
+            result[st.top()] = arr[i]; 
+            st.pop();
+        }
+        st.push(i);
+    }
+
+    return result;
+}",1,1.0
+Stack_6,1531756,2210535,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    int n=arr.size();
+    vector<int> result(n, -1);
+    stack<int> st;
+    for (int i=0; i<n; i++) {
+        while (!st.empty() && arr[i] > arr[st.top()])   {
+            result[st.top()] = arr[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+    return result;
+}",1,1.0
+Stack_6,1532367,2211738,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& arr){
+    stack<int> stk;
+    for(int i = 0; i < arr.size(); i++){
+        stk.push(arr[i]);
+        for(int j = i+1; j < arr.size(); j++){
+            if(arr[j] > stk.top()){
+                arr[i] = arr[j];
+                break;
+            }
+        }
+        if(arr[i] != stk.top()){
+            stk.pop();
+        }else{
+            arr[i] = -1;
+        }
+    }
+    return arr;
+}",4,1.0
+Stack_6,1536183,2210034,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& nums) {
+    int n = nums.size();
+    vector<int> res(n, -1);
+    stack<int> st;
+
+    for (int i = 0; i < n; ++i) {
+        while (!st.empty() && nums[st.top()] < nums[i]) {
+            res[st.top()] = nums[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+
+    return res;
+}",1,1.0
+Stack_6,1536579, ,"// iostream, stack and vector are included
+
+vector<int> nextGreater(vector<int>& nums) {
+    int n = nums.size();
+    vector<int> res(n, -1);
+    stack<int> st;
+
+    for (int i = 0; i < n; ++i) {
+        while (!st.empty() && nums[st.top()] < nums[i]) {
+            res[st.top()] = nums[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+
+    return res;
+}",1,1.0
+Stack_6,1536618,2211170,"// iostream, stack and vector are included
+
+vector<int> nextGreater(std::vector<int>& arr) {
+    int n = arr.size();
+    std::vector<int> result(n, -1); // Initialize the result vector with -1
+    
+    std::stack<int> st;
+    
+    for (int i = 0; i < n; i++) {
+        while (!st.empty() && arr[st.top()] < arr[i]) {
+            result[st.top()] = arr[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+    
+    return result;
+}",1,1.0

@@ -1,0 +1,1238 @@
+problem_slug,submission_id,student_code,code,labels,score
+Stack_3,1454531,2210997,"int trap(vector<int>& height) {
+    int n = height.size();
+    if (n <= 2) return 0;  
+    vector<int> left_max(n);
+    vector<int> right_max(n);
+    left_max[0] = height[0];
+    for (int i = 1; i < n; i++) left_max[i] = max(left_max[i - 1], height[i]);
+    right_max[n - 1] = height[n - 1];
+    for (int i = n - 2; i >= 0; i--)  right_max[i] = max(right_max[i + 1], height[i]);
+    int trappedWater = 0;
+    for (int i = 0; i < n; i++) trappedWater += max(0, min(left_max[i], right_max[i]) - height[i]);
+    
+
+    return trappedWater;
+
+
+}",0,1.0
+Stack_3,1454547,2212303,"int findMaxPosition(std::vector<int>& vec) {
+    if (vec.empty()) {
+        // Handle the case of an empty vector or no maximum element.
+        return -1;  // You can return any appropriate value, e.g., -1.
+    }
+
+    int max = vec[0];  // Initialize max with the first element.
+    int position = 0;  // Initialize the position to 0.
+
+    for (size_t i = 1; i < vec.size(); i++) {
+        if (vec[i] > max) {
+            // If a greater element is found, update max and position.
+            max = vec[i];
+            position = i;
+        }
+    }
+
+    return position;
+}
+
+int trap(vector<int>& height) {
+    if(height.empty()) return 0;
+    int max = findMaxPosition(height);
+    //cout<<max<<endl;
+    stack<int> waterLv;
+    int result = 0;
+    int left = 0;
+    int leftMax = height[0];
+    int right = height.size() - 1;
+    int rightMax = height[right];
+
+    while (left < max) {
+        if (height[left] > leftMax) {
+            //cout<<leftMax<<endl;
+            leftMax = height[left];
+            while (!waterLv.empty()) {
+                result += waterLv.top();
+                //cout<<waterLv.top()<<endl;
+                waterLv.pop();
+            }
+        } else {
+           
+            
+            waterLv.push(leftMax - height[left]);
+           
+        }
+        left++;
+    }
+ 
+
+    while (right > max) {
+        if (height[right] > rightMax) {
+            rightMax = height[right];
+            while (!waterLv.empty()) {
+                result += waterLv.top();
+                waterLv.pop();
+            }
+        } else {
+            waterLv.push(rightMax - height[right]);
+        }
+        right--;
+    }
+    while (!waterLv.empty()) {
+                result += waterLv.top();
+                //cout<<waterLv.top()<<endl;
+                waterLv.pop();
+    }
+    return result;
+}",4,0.9
+Stack_3,1454553,2211876,"int trap(vector<int>& height) {
+//TODO
+    int left = 0;   // Con trỏ trái
+    int right = height.size() - 1;  // Con trỏ phải
+    int leftMax = 0;  // Chiều cao lớn nhất từ bên trái
+    int rightMax = 0;  // Chiều cao lớn nhất từ bên phải
+    int result = 0;  // Tổng diện tích mặt cắt nước
+
+    while (left < right) {
+        if (height[left] < height[right]) {
+            if (height[left] > leftMax) {
+                leftMax = height[left];
+            } else {
+                result += leftMax - height[left];
+            }
+            left++;
+        } else {
+            if (height[right] > rightMax) {
+                rightMax = height[right];
+            } else {
+                result += rightMax - height[right];
+            }
+            right--;
+        }
+    }
+
+    return result;
+}",1,1.0
+Stack_3,1454572,2210200,"int trap(vector<int>& height) {
+//TODO 
+    int n = height.size();
+    if(n == 0) return 0;
+    vector<int> l(n, 0), r(n, 0);
+    l[0] = height[0];
+    r[n - 1] = height[n - 1];
+    for(int i = 1; i < n; i++) l[i] = max(l[i-1], height[i]);
+    for(int i = n - 2; i >= 0; i--) r[i] = max(r[i + 1], height[i]);
+    int ans = 0;
+    for(int i = 0; i < n; i++){
+        int val = min(l[i], r[i]);
+        if(val >= height[i]){
+            ans += val - height[i];
+        }
+    }
+    return ans;
+}",0,1.0
+Stack_3,1454582,2211170,"int trap(vector<int>& height) {
+        if(height.empty()) 
+            return 0; 
+        int n = height.size();
+        int res = 0;
+        stack<int> s;   
+        for(int i=0; i<n; i++) {
+            while(!s.empty() && height[i] > height[s.top()]) {
+                int rightIdx = s.top();
+                s.pop();
+                
+                if(s.empty()) 
+                    break;
+                
+                int leftIdx = s.top();
+                int length = min(height[i], height[leftIdx]) - height[rightIdx];
+                int breadth = i - leftIdx - 1;
+                res += length*breadth;
+            }
+            s.push(i);
+        }
+        return res;
+}",2,1.0
+Stack_3,1454585,2210103,"int trap(vector<int>& height) {
+        int max_left=0, max_right = 0;
+        int left = 0, right = height.size()-1;
+        int ans = 0;
+        while(left <= right){
+            if(height[left] <= height[right]){
+                if(height[left] >= max_left){
+                    max_left = height[left];
+                }
+                else{
+                    ans += max_left - height[left];
+                }
+                left ++;
+            }
+            else{
+                if(height[right] >= max_right){
+                    max_right = height[right];
+                }
+                else{
+                    ans += max_right - height[right];
+                }
+                right --;
+            }
+        }
+        return ans;
+    }",1,1.0
+Stack_3,1454587,2210535,"int trap(vector<int>& height) {
+    //TODO
+    int n = height.size();
+    if (n <= 1) return 0;
+    stack <int> st;
+    int maxheight = height[0];
+    vector<int> ans(n,0);
+    for (int i = 0; i < n; i++)
+    {
+        if (height[i] >= maxheight)
+        {
+            while (!st.empty() && maxheight >= height[st.top()])
+            {
+                ans[st.top()] = maxheight - height[st.top()];
+                st.pop();
+            }
+            maxheight = height[i];
+        }
+        st.push(i);
+    }
+    maxheight = height[st.top()];
+    st.pop();
+    while (!st.empty())
+    {
+        if (height[st.top()] >= maxheight)
+        {
+            maxheight = height[st.top()];
+            st.pop();
+        }
+        else
+        {
+            ans[st.top()] = maxheight - height[st.top()];
+            st.pop();
+        }
+    }
+    int answer = 0;
+    /*for (int i = 0; i < n; i++)
+    {
+        cout << ans[i] << "" "";
+    }
+    cout << endl;*/
+    for (int i = 0; i < n; i++)
+    {
+        answer += ans[i];
+    }
+    return answer;
+}",3,1.0
+Stack_3,1454594,2210578,"int trap(vector<int>& height) {
+    //TODO
+    int n = height.size();
+    if (n <= 1) return 0;
+    stack <int> st;
+    int maxheight = height[0];
+    vector<int> ans(n,0);
+    for (int i = 0; i < n; i++)
+    {
+        if (height[i] >= maxheight)
+        {
+            while (!st.empty() && maxheight >= height[st.top()])
+            {
+                ans[st.top()] = maxheight - height[st.top()];
+                st.pop();
+            }
+            maxheight = height[i];
+        }
+        st.push(i);
+    }
+    maxheight = height[st.top()];
+    st.pop();
+    while (!st.empty())
+    {
+        if (height[st.top()] >= maxheight)
+        {
+            maxheight = height[st.top()];
+            st.pop();
+        }
+        else
+        {
+            ans[st.top()] = maxheight - height[st.top()];
+            st.pop();
+        }
+    }
+    int answer = 0;
+   
+    for (int i = 0; i < n; i++)
+    {
+        answer += ans[i];
+    }
+    return answer;
+}",3,1.0
+Stack_3,1454631,2210458,0,#include <climits>
+
+int trap(vector<int>& h) {
+    int l=0,r=h.size()-1, lmax=INT_MIN, rmax=INT_MIN, ans=0;
+    while(l<r){
+        lmax=max(lmax,h[l]);
+        rmax=max(rmax,h[r]);
+        ans+=(lmax<rmax)?lmax-h[l++]:rmax-h[r--];
+    }
+    return ans;
+}",1,1.0
+Stack_3,1454649,2210034,"int posMax(vector<int> & height)
+{
+    int pos = 0;
+    int max = -1e6;
+    for(unsigned int i  = 0 ; i < height.size(); ++i)
+    {
+        if(height[i] >= max)
+        {
+            max = height[i];
+            pos  = i;
+        }
+    }
+    return pos;
+}
+int trap(vector<int>& height) {
+    int postop = posMax(height);
+    int total = 0;
+    for(int i = 0; i < postop; ++i)
+    {
+        if(height[i+1] < height[i])
+        {
+            total += height[i] - height[i+1];
+            height[i+1] = height[i];
+        }
+    }
+    for(int i = height.size() - 1 ; i > postop; --i)
+    {
+        if(height[i-1] < height[i])
+        {
+            total += height[i] - height[i-1];
+            height[i-1] = height[i];
+        }
+    }
+    return total;
+}",4,1.0
+Stack_3,1454650,2213035,"int trap(vector<int>& height) {
+    stack<int> st;
+    unsigned int n = height.size();
+    if (n < 2) return 0;
+    int ans = 0;
+    for (unsigned int i = 0; i < n; i++) {
+        while (!st.empty() && height[i] > height[st.top()]) {
+            int top = st.top();
+            st.pop();
+            if (st.empty()) break;
+            int bH = height[i] > height[st.top()] ? height[st.top()] : height[i];
+            int dis = i - st.top() - 1;
+            ans += dis * (bH - height[top]);
+        }
+        st.push(i);
+    }
+    return ans;
+}",2,0.95
+Stack_3,1454652,2212372,"int trap(vector<int>& height) {
+    stack<int> st;
+    unsigned int n = height.size();
+
+    if (n < 2) {
+        return 0;
+    }
+
+    int ans = 0;
+
+    for (unsigned int i = 0; i < n; i++) {
+        while (!st.empty() && height[i] > height[st.top()]) {
+            int top = st.top();
+            st.pop();
+
+            if (st.empty()) break;
+
+            int bH = height[i] > height[st.top()] ? height[st.top()] : height[i];
+            int dis = i - st.top() - 1;
+            ans += dis * (bH - height[top]);
+        }
+        st.push(i);
+    }
+    return ans;
+}",2,1.0
+Stack_3,1454655,2211821,"int trap(vector<int>& height) {
+//TODO
+ int n = height.size();
+    if (n <= 2) return 0;
+
+    int left = 0; // Con trỏ trái
+    int right = n - 1; // Con trỏ phải
+    int leftMax = 0; // Chiều cao lớn nhất ở bên trái
+    int rightMax = 0; // Chiều cao lớn nhất ở bên phải
+    int trappedWater = 0;
+
+    while (left < right) {
+        if (height[left] < height[right]) {
+            if (height[left] > leftMax) {
+                leftMax = height[left];
+            } else {
+                trappedWater += leftMax - height[left];
+            }
+            left++;
+        } else {
+            if (height[right] > rightMax) {
+                rightMax = height[right];
+            } else {
+                trappedWater += rightMax - height[right];
+            }
+            right--;
+        }
+    }
+
+    return trappedWater;
+}",1,1.0
+Stack_3,1454659,2212282,"int trap(vector<int>& height) {
+    int n = height.size();
+    if (n <= 2) {
+        return 0; // Không có đủ các cạnh tường để chứa nước
+    }
+    
+    vector<int> leftMax(n, 0); // Chiều cao lớn nhất từ bên trái
+    vector<int> rightMax(n, 0); // Chiều cao lớn nhất từ bên phải
+    
+    leftMax[0] = height[0];
+    for (int i = 1; i < n; i++) {
+        leftMax[i] = max(leftMax[i-1], height[i]);
+    }
+    
+    rightMax[n-1] = height[n-1];
+    for (int i = n - 2; i >= 0; i--) {
+        rightMax[i] = max(rightMax[i+1], height[i]);
+    }
+    
+    int water = 0; // Tổng diện tích mặt cắt nước
+    
+    for (int i = 1; i < n - 1; i++) {
+        int minWallHeight = min(leftMax[i], rightMax[i]);
+        water += max(minWallHeight - height[i], 0);
+    }
+    
+    return water;
+}",0,1.0
+Stack_3,1454661,2213248,"int trap(vector<int>& height) {
+    //TODO
+    int n = height.size();
+    if (n <= 1) return 0;
+    stack <int> st;
+    int maxheight = height[0];
+    vector<int> ans(n,0);
+    for (int i = 0; i < n; i++)
+    {
+        if (height[i] >= maxheight)
+        {
+            while (!st.empty() && maxheight >= height[st.top()])
+            {
+                ans[st.top()] = maxheight - height[st.top()];
+                st.pop();
+            }
+            maxheight = height[i];
+        }
+        st.push(i);
+    }
+    maxheight = height[st.top()];
+    st.pop();
+    while (!st.empty())
+    {
+        if (height[st.top()] >= maxheight)
+        {
+            maxheight = height[st.top()];
+            st.pop();
+        }
+        else
+        {
+            ans[st.top()] = maxheight - height[st.top()];
+            st.pop();
+        }
+    }
+    int answer = 0;
+    /*for (int i = 0; i < n; i++)
+    {
+        cout << ans[i] << "" "";
+    }
+    cout << endl;*/
+    for (int i = 0; i < n; i++)
+    {
+        answer += ans[i];
+    }
+    return answer;
+}",3,1.0
+Stack_3,1454662,2210055,"int trap(vector<int>& height) {
+//TODO
+ int n = height.size();
+    if (n <= 2) {
+        return 0;  // Không thể chứa nước nếu số tường ít hơn 3
+    }
+
+    int left = 0;  // Con trỏ trái
+    int right = n - 1;  // Con trỏ phải
+    int leftMax = 0;  // Chiều cao tường lớn nhất từ bên trái
+    int rightMax = 0;  // Chiều cao tường lớn nhất từ bên phải
+    int trappedWater = 0;  // Lượng nước mưa chứa được
+
+    while (left < right) {
+        if (height[left] < height[right]) {
+            if (height[left] >= leftMax) {
+                leftMax = height[left];
+            } else {
+                trappedWater += leftMax - height[left];
+            }
+            left++;
+        } else {
+            if (height[right] >= rightMax) {
+                rightMax = height[right];
+            } else {
+                trappedWater += rightMax - height[right];
+            }
+            right--;
+        }
+    }
+
+    return trappedWater;
+}",1,1.0
+Stack_3,1454665,2211878,"int trap(vector<int>& height) {
+    int n = height.size();
+    if(n == 0) return 0;
+    vector<int> left(n), right(n);
+    left[0] = height[0];
+    right[n-1] = height[n-1];
+    for(int i = 1; i < n; i++) {
+        left[i] = max(left[i-1], height[i]);
+        right[n-i-1] = max(right[n-i], height[n-i-1]);
+    }
+    int water = 0;
+    for(int i = 0; i < n; i++) {
+        water += min(left[i], right[i]) - height[i];
+    }
+    return water;
+}",0,1.0
+Stack_3,1454669,2213250,"int trap(vector<int>& height) {
+    //TODO
+    int n = height.size();
+    if (n <= 1) return 0;
+    stack <int> st;
+    int maxheight = height[0];
+    vector<int> ans(n,0);
+    for (int i = 0; i < n; i++)
+    {
+        if (height[i] >= maxheight)
+        {
+            while (!st.empty() && maxheight >= height[st.top()])
+            {
+                ans[st.top()] = maxheight - height[st.top()];
+                st.pop();
+            }
+            maxheight = height[i];
+        }
+        st.push(i);
+    }
+    maxheight = height[st.top()];
+    st.pop();
+    while (!st.empty())
+    {
+        if (height[st.top()] >= maxheight)
+        {
+            maxheight = height[st.top()];
+            st.pop();
+        }
+        else
+        {
+            ans[st.top()] = maxheight - height[st.top()];
+            st.pop();
+        }
+    }
+    int answer = 0;
+    /*for (int i = 0; i < n; i++)
+    {
+        cout << ans[i] << "" "";
+    }
+    cout << endl;*/
+    for (int i = 0; i < n; i++)
+    {
+        answer += ans[i];
+    }
+    return answer;
+}",3,0.9
+Stack_3,1454675,2211667,"int trap(vector<int>& height) {
+//TODO
+int n = height.size();
+    int res = 0;
+    for (int i = 1; i < n - 1; i++)
+    {
+        int left = height[i];
+        for (int j = 0; j < i; j++)
+        {
+            left = max(left, height[j]);
+        }
+        int right = height[i];
+        for (int j = i + 1; j < n; j++)
+        {
+            right = max(right, height[j]);
+        }
+        res = res + min(left, right) - height[i];
+    }
+    return res;
+}",0,1.0
+Stack_3,1454685,2110501,"int trap(vector<int>& height) {
+//TODO
+     stack<int> s;
+    int water = 0;
+    int i = 0;
+
+    while (i < int(height.size())) {
+        while (!s.empty() && height[i] > height[s.top()]) {
+            int top = s.top();
+            s.pop();
+
+            if (s.empty())
+                break;
+
+            int distance = i - s.top() - 1;
+            int bounded_height = min(height[i], height[s.top()]) - height[top];
+            water += distance * bounded_height;
+        }
+
+        s.push(i++);
+    }
+
+    return water;
+}",2,1.0
+Stack_3,1454687,1913560,"int trap(vector<int>& height) {
+    int left = 0; 
+    int right = height.size() - 1; 
+    int leftMax = 0;
+    int rightMax = 0;
+    int result = 0; 
+
+    while (left < right) {
+        if (height[left] < height[right]) {
+            if (height[left] >= leftMax) {
+                leftMax = height[left]; 
+            } else {
+                result += (leftMax - height[left]); 
+            }
+            left++; 
+        } else {
+            if (height[right] >= rightMax) {
+                rightMax = height[right]; 
+            } else {
+                result += (rightMax - height[right]); 
+            }
+            right--; 
+        }
+    }
+
+    return result; 
+}",1,1.0
+Stack_3,1454703,2112585,"int trap(vector<int>& height) {
+stack<int> st;
+    int water = 0;
+    
+    for (int i = 0; i < int(height.size()); i++) {
+        while (!st.empty() && height[i] > height[st.top()]) {
+            int top = st.top();
+            st.pop();
+            
+            if (st.empty()) {
+                break;
+            }
+            
+            int distance = i - st.top() - 1;
+            int boundedHeight = min(height[i], height[st.top()]) - height[top];
+            water += distance * boundedHeight;
+        }
+        
+        st.push(i);
+    }
+    
+    return water;
+}",2,1.0
+Stack_3,1454710,2212935,"int trap(vector<int>& height) {
+//TODO
+stack<int> st;
+    int water = 0;
+    int n = height.size();
+
+    for (int i = 0; i < n; i++) {
+        while (!st.empty() && height[i] > height[st.top()]) {
+            int top = st.top();
+            st.pop();
+
+            if (st.empty()) {
+                break;
+            }
+
+            int distance = i - st.top() - 1;
+            int boundedHeight = min(height[i], height[st.top()]) - height[top];
+            water += distance * boundedHeight;
+        }
+
+        st.push(i);
+    }
+
+    return water;
+}",2,1.0
+Stack_3,1454732,2212651,"int trap(vector<int>& height)
+{ 
+    int n=height.size();
+    stack<int> st; 
+    int res = 0; 
+    for (int i = 0; i < n; i++) { 
+        while ((!st.empty()) && (height[st.top()] < height[i])) { 
+            int pop_height = height[st.top()]; 
+            st.pop(); 
+            if (st.empty()) break; 
+            int distance = i - st.top() - 1; 
+            int min_height = min(height[st.top()], height[i]) - pop_height; 
+            res += distance * min_height; 
+        }
+        st.push(i); 
+    } 
+    return res; 
+}",2,1.0
+Stack_3,1454736,2213298,"int trap(vector<int>& height) {
+//TODO
+    stack<int> st;
+    for (int begin = 0, end = height.size() - 1; begin <= end;) {
+        if (height[begin] <= height[end]) {
+            while (height[begin] <= height[end] && begin <= end) {
+                int sum = 0;
+                int temp = begin + 1;
+                while (height[temp] <= height[begin]) {
+                    sum += height[begin] - height[temp];
+                    temp++;
+                    if (temp > end) break;
+                }
+                st.push(sum);
+                begin = temp;
+                if (height[begin] == height[end]) break;
+            }
+        }
+        else {
+            while (height[begin] > height[end] && begin <= end) {
+                int sum = 0;
+                int temp = end - 1;
+                while (height[temp] <= height[end]) {
+                    sum += height[end] - height[temp];
+                    temp--;
+                    if (temp < begin) break;
+                }
+                st.push(sum);
+                end = temp;
+            }
+        }
+    }
+    int result = 0;
+    while (!st.empty()) {
+        result += st.top();
+        st.pop();
+    }
+    return result;
+}",5,0.58
+Stack_3,1454803,2210532,"int trap(vector<int>& height) {
+    // Stores the indices of the bars 
+    stack<int> st; 
+  
+    // Stores the final result 
+    int ans = 0; 
+  
+    // Loop through the each bar 
+    for (unsigned int i = 0; i < height.size(); i++) { 
+  
+        // Remove bars from the stack 
+        // until the condition holds 
+        while ((!st.empty()) 
+               && (height[st.top()] < height[i])) { 
+  
+            // Store the height of the top 
+            // and pop it. 
+            int pop_height = height[st.top()]; 
+            st.pop(); 
+  
+            // If the stack does not have any 
+            // bars or the popped bar 
+            // has no left boundary 
+            if (st.empty()) 
+                break; 
+  
+            // Get the distance between the 
+            // left and right boundary of 
+            // popped bar 
+            int distance = i - st.top() - 1; 
+  
+            // Calculate the min. height 
+            int min_height 
+                = min(height[st.top()], height[i]) 
+                  - pop_height; 
+  
+            ans += distance * min_height; 
+        } 
+  
+        // If the stack is either empty or 
+        // height of the current bar is less than 
+        // or equal to the top bar of stack 
+        st.push(i); 
+    } 
+    return ans; 
+}",2,1.0
+Stack_3,1454923,2211367,"int trap(vector<int>& height) {
+//TODO
+int n = height.size();
+    if (n <= 2) return 0; // Có ít hơn 3 cạnh tường không thể chứa nước.
+
+    std::vector<int> leftMax(n);  // Lưu chiều cao tối đa bên trái của mỗi cạnh.
+    std::vector<int> rightMax(n); // Lưu chiều cao tối đa bên phải của mỗi cạnh.
+
+    // Tính chiều cao tối đa bên trái của mỗi cạnh.
+    leftMax[0] = height[0];
+    for (int i = 1; i < n; i++) {
+        leftMax[i] = std::max(leftMax[i - 1], height[i]);
+    }
+
+    // Tính chiều cao tối đa bên phải của mỗi cạnh.
+    rightMax[n - 1] = height[n - 1];
+    for (int i = n - 2; i >= 0; i--) {
+        rightMax[i] = std::max(rightMax[i + 1], height[i]);
+    }
+
+    int totalWater = 0;
+    for (int i = 0; i < n; i++) {
+        int minHeight = std::min(leftMax[i], rightMax[i]);
+        totalWater += minHeight - height[i];
+    }
+
+    return totalWater;
+}",0,1.0
+Stack_3,1455019,2212499,"int trap(vector<int>& height) {
+int n = height.size();
+    if (n == 0) {
+        return 0;
+    }
+
+    std::vector<int> leftMax(n), rightMax(n);
+    leftMax[0] = height[0];
+    rightMax[n - 1] = height[n - 1];
+
+    for (int i = 1; i < n; ++i) {
+        leftMax[i] = std::max(leftMax[i - 1], height[i]);
+    }
+
+    for (int i = n - 2; i >= 0; --i) {
+        rightMax[i] = std::max(rightMax[i + 1], height[i]);
+    }
+
+    int water = 0;
+    for (int i = 0; i < n; ++i) {
+        water += std::min(leftMax[i], rightMax[i]) - height[i];
+    }
+
+    return water;
+}",0,1.0
+Stack_3,1455121,2213836,"int trap(vector<int>& height) {
+    int left = 0;
+    int right = height.size() - 1;
+    int leftMax = 0;
+    int rightMax = 0;
+    int water = 0;
+
+    while (left <= right) {
+        if (height[left] <= height[right]) {
+            if (height[left] > leftMax) {
+                leftMax = height[left];
+            } else {
+                water += leftMax - height[left];
+            }
+            left++;
+        } else {
+            if (height[right] > rightMax) {
+                rightMax = height[right];
+            } else {
+                water += rightMax - height[right];
+            }
+            right--;
+        }
+    }
+
+    return water;
+}",1,1.0
+Stack_3,1501583,2252260,"int trap(vector<int>& height) {
+    //TODO
+    int n = height.size();
+    int max_left[n];
+    max_left[0] = height[0];
+    for(int i=1; i<n; i++)
+        max_left[i] = max(max_left[i-1], height[i]);
+    
+    int max_right[n];
+    max_right[n-1] = height[n-1];
+    for(int i = n-2; i>=0; i--){
+        max_right[i] = max(max_right[i+1], height[i]);
+    }
+    
+    int total = 0;    
+    for(unsigned int i=0; i<height.size(); i++){
+        int water_at_index = min(max_left[i], max_right[i]) - height[i];
+        total += water_at_index;
+    }
+    return total;
+}",0,0.83
+Stack_3,1520666,2212741,"int trap(vector<int>& height) {
+//TODO
+ // Stores the indices of the bars 
+    stack<int> st; 
+  int n=height.size();
+    // Stores the final result 
+    int ans = 0; 
+  
+    // Loop through the each bar 
+    for (int i = 0; i < n; i++) { 
+  
+        // Remove bars from the stack 
+        // until the condition holds 
+        while ((!st.empty()) 
+               && (height[st.top()] < height[i])) { 
+  
+            // Store the height of the top 
+            // and pop it. 
+            int pop_height = height[st.top()]; 
+            st.pop(); 
+  
+            // If the stack does not have any 
+            // bars or the popped bar 
+            // has no left boundary 
+            if (st.empty()) 
+                break; 
+  
+            // Get the distance between the 
+            // left and right boundary of 
+            // popped bar 
+            int distance = i - st.top() - 1; 
+  
+            // Calculate the min. height 
+            int min_height 
+                = min(height[st.top()], height[i]) 
+                  - pop_height; 
+  
+            ans += distance * min_height; 
+        } 
+  
+        // If the stack is either empty or 
+        // height of the current bar is less than 
+        // or equal to the top bar of stack 
+        st.push(i); 
+    } 
+    return ans; 
+}",2,1.0
+Stack_3,1521743,2211738,"int trap(vector<int>& height) {
+//TODO
+stack<int> st;
+    unsigned int n = height.size();
+
+    if (n < 2) {
+        return 0;
+    }
+
+    int ans = 0;
+
+    for (unsigned int i = 0; i < n; i++) {
+        while (!st.empty() && height[i] > height[st.top()]) {
+            int top = st.top();
+            st.pop();
+
+            if (st.empty()) break;
+
+            int bH = height[i] > height[st.top()] ? height[st.top()] : height[i];
+            int dis = i - st.top() - 1;
+            ans += dis * (bH - height[top]);
+        }
+        st.push(i);
+    }
+    return ans;
+}",2,1.0
+Stack_3,1525055,2212935,"int trap(vector<int>& height) {
+//TODO
+stack<int> st;
+    int water = 0;
+    int n = height.size();
+
+    for (int i = 0; i < n; i++) {
+        while (!st.empty() && height[i] > height[st.top()]) {
+            int top = st.top();
+            st.pop();
+
+            if (st.empty()) {
+                break;
+            }
+
+            int distance = i - st.top() - 1;
+            int boundedHeight = min(height[i], height[st.top()]) - height[top];
+            water += distance * boundedHeight;
+        }
+
+        st.push(i);
+    }
+
+    return water;
+}",2,1.0
+Stack_3,1528061,1912532,"int trap(vector<int>& height) {
+    int n = height.size();
+    if (n <= 2) {
+        return 0;
+    }
+
+    vector<int> leftMax(n);  // Lưu trữ chiều cao tối đa từ bên trái
+    vector<int> rightMax(n); // Lưu trữ chiều cao tối đa từ bên phải
+
+    leftMax[0] = height[0];
+    for (int i = 1; i < n; i++) {
+        leftMax[i] = max(leftMax[i - 1], height[i]);
+    }
+
+    rightMax[n - 1] = height[n - 1];
+    for (int i = n - 2; i >= 0; i--) {
+        rightMax[i] = max(rightMax[i + 1], height[i]);
+    }
+
+    int trappedWater = 0;
+    for (int i = 1; i < n - 1; i++) {
+        trappedWater += min(leftMax[i], rightMax[i]) - height[i];
+    }
+
+    return trappedWater;
+}",0,1.0
+Stack_3,1531430,2211876,"int trap(vector<int>& height) {
+//TODO
+    int n = height.size();
+    if (n <= 2) {
+        return 0; 
+    }
+
+    int left = 0, right = n - 1;
+    int leftMax = 0, rightMax = 0;
+    int trappedWater = 0;
+
+    while (left < right) {
+        if (height[left] < height[right]) {
+            if (height[left] > leftMax) {
+                leftMax = height[left];
+            } else {
+                trappedWater += leftMax - height[left];
+            }
+            left++;
+        } else {
+            if (height[right] > rightMax) {
+                rightMax = height[right];
+            } else {
+                trappedWater += rightMax - height[right];
+            }
+            right--;
+        }
+    }
+
+    return trappedWater;
+}",1,1.0
+Stack_3,1531631,2210055,"int trap(vector<int>& height) {
+//TODO
+ int n = height.size();
+    if (n == 0) {
+        return 0;
+    }
+
+    int left = 0; 
+    int right = n - 1; 
+    int leftMax = 0; 
+    int rightMax = 0; 
+    int trappedWater = 0;
+    while (left < right) {
+        if (height[left] < height[right]) {
+            if (height[left] > leftMax) {
+                leftMax = height[left];
+            } else {
+                trappedWater += leftMax - height[left];
+            }
+            left++;
+        } else {
+            if (height[right] > rightMax) {
+                rightMax = height[right];
+            } else {
+                trappedWater += rightMax - height[right];
+            }
+            right--;
+        }
+    }
+    return trappedWater;
+}",1,1.0
+Stack_3,1531756,2210535,"int trap(vector<int>& height) {
+    //TODO
+    int n = height.size();
+    if (n <= 1) return 0;
+    stack <int> st;
+    int maxheight = height[0];
+    vector<int> ans(n,0);
+    for (int i = 0; i < n; i++)
+    {
+        if (height[i] >= maxheight)
+        {
+            while (!st.empty() && maxheight >= height[st.top()])
+            {
+                ans[st.top()] = maxheight - height[st.top()];
+                st.pop();
+            }
+            maxheight = height[i];
+        }
+        st.push(i);
+    }
+    maxheight = height[st.top()];
+    st.pop();
+    while (!st.empty())
+    {
+        if (height[st.top()] >= maxheight)
+        {
+            maxheight = height[st.top()];
+            st.pop();
+        }
+        else
+        {
+            ans[st.top()] = maxheight - height[st.top()];
+            st.pop();
+        }
+    }
+    int answer = 0;
+    /*for (int i = 0; i < n; i++)
+    {
+        cout << ans[i] << "" "";
+    }
+    cout << endl;*/
+    for (int i = 0; i < n; i++)
+    {
+        answer += ans[i];
+    }
+    return answer;
+}",3,1.0
+Stack_3,1532367,2211738,"int trap(vector<int>& height) {
+//TODO
+stack<int> st;
+    unsigned int n = height.size();
+
+    if (n < 2) {
+        return 0;
+    }
+
+    int ans = 0;
+
+    for (unsigned int i = 0; i < n; i++) {
+        while (!st.empty() && height[i] > height[st.top()]) {
+            int top = st.top();
+            st.pop();
+
+            if (st.empty()) break;
+
+            int bH = height[i] > height[st.top()] ? height[st.top()] : height[i];
+            int dis = i - st.top() - 1;
+            ans += dis * (bH - height[top]);
+        }
+        st.push(i);
+    }
+    return ans;
+}",2,1.0
+Stack_3,1536183,2210034,"int posMax(vector<int> & height)
+{
+    int pos = 0;
+    int max = -1e6;
+    for(unsigned int i  = 0 ; i < height.size(); ++i)
+    {
+        if(height[i] >= max)
+        {
+            max = height[i];
+            pos  = i;
+        }
+    }
+    return pos;
+}
+int trap(vector<int>& height) {
+    int postop = posMax(height);
+    int total = 0;
+    for(int i = 0; i < postop; ++i)
+    {
+        if(height[i+1] < height[i])
+        {
+            total += height[i] - height[i+1];
+            height[i+1] = height[i];
+        }
+    }
+    for(int i = height.size() - 1 ; i > postop; --i)
+    {
+        if(height[i-1] < height[i])
+        {
+            total += height[i] - height[i-1];
+            height[i-1] = height[i];
+        }
+    }
+    return total;
+}",4,1.0
+Stack_3,1536579, ,"int posMax(vector<int> & height)
+{
+    int pos = 0;
+    int max = -1e6;
+    for(unsigned int i  = 0 ; i < height.size(); ++i)
+    {
+        if(height[i] >= max)
+        {
+            max = height[i];
+            pos  = i;
+        }
+    }
+    return pos;
+}
+int trap(vector<int>& height) {
+    int postop = posMax(height);
+    int total = 0;
+    for(int i = 0; i < postop; ++i)
+    {
+        if(height[i+1] < height[i])
+        {
+            total += height[i] - height[i+1];
+            height[i+1] = height[i];
+        }
+    }
+    for(int i = height.size() - 1 ; i > postop; --i)
+    {
+        if(height[i-1] < height[i])
+        {
+            total += height[i] - height[i-1];
+            height[i-1] = height[i];
+        }
+    }
+    return total;
+}",4,1.0
+Stack_3,1536618,2211170,"int trap(vector<int>& height) {
+        if(height.empty()) 
+            return 0; 
+        int n = height.size();
+        int res = 0;
+        stack<int> s;   
+        for(int i=0; i<n; i++) {
+            while(!s.empty() && height[i] > height[s.top()]) {
+                int rightIdx = s.top();
+                s.pop();
+                
+                if(s.empty()) 
+                    break;
+                
+                int leftIdx = s.top();
+                int length = min(height[i], height[leftIdx]) - height[rightIdx];
+                int breadth = i - leftIdx - 1;
+                res += length*breadth;
+            }
+            s.push(i);
+        }
+        return res;
+}",2,1.0

@@ -3,3 +3,9 @@
 
 # output directories
 codet5p_output
+
+# pretrained folder for storing pretrained state_dict
+pretrained
+
+# Nguyen Truong workspace
+nhlcoding-clustering-pipeline.code-workspace
