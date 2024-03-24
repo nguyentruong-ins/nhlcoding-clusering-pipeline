@@ -5,7 +5,7 @@ import numpy as np
 import collections
 import os
 import shutil
-import pandas as pd
+from sklearn.metrics.cluster import adjusted_rand_score
 
 class Clusterer():
     def __init__(self) -> None:
@@ -31,7 +31,7 @@ class Clusterer():
         y = pca_result[:, 1]
         z = pca_result[:, 2]
 
-        fig = plt.figure(figsize = (10, 7))
+        # fig = plt.figure(figsize = (10, 7))
         ax = plt.axes(projection = "3d")
 
         scatter = ax.scatter3D(x, y, z, c = label)
@@ -78,11 +78,37 @@ class Clusterer():
 
         return
     
-    def cluster_process(self, df):
+    def dbscan_cluster_process(self, df, eps=None, min_samples=None):
+        local_eps = 0.5 if (eps is None) else eps
+        local_min_samples = 5 if (min_samples is None) else min_samples
+
         ####### Clustering using DBSCAN ###########
-        dbscan_model = DBSCAN(eps=0.25, min_samples=3)
+        dbscan_model = DBSCAN(eps=local_eps, min_samples=local_min_samples)
 
         dbscan = dbscan_model.fit(df)
         ############################################
 
         return dbscan
+    
+    def parameters_optimization(self, df, labels):
+        # Test the results
+        min_samples_range = range(2, 4)
+        eps_range = [ele/100 for ele in range(10, 55, 5)]
+
+        # Max
+        max_ari = -1
+        returned_eps = None
+        returned_min_samples = None
+
+        for looped_eps in eps_range:
+            for looped_min_samples in min_samples_range:
+                dbscan_model = DBSCAN(eps=looped_eps, min_samples=looped_min_samples)
+                dbscan = dbscan_model.fit(df)
+
+                ari = adjusted_rand_score(labels, dbscan.labels_)
+                if (ari > max_ari):
+                    returned_eps = looped_eps
+                    returned_min_samples = looped_min_samples
+                    max_ari = ari
+        
+        return returned_eps, returned_min_samples
